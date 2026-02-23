@@ -21,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (app()->environment('production')) {
+            app()->useStoragePath('/tmp');
+        }
         View::composer('*', function ($view) {
             $view->with('allCompany', Company::all());
         });
