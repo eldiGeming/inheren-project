@@ -26,11 +26,13 @@ class TypeCertificateController extends Controller
         $request->validate([
             'type_certificate' => 'required|max:255',
             'description_certificate' => 'required',
+            'scope_certificate' => 'required',
         ]);
 
         $typeCertificate = new TypeCertificate();
         $typeCertificate->type_certificate = $request->type_certificate;
         $typeCertificate->description_certificate = $request->description_certificate;
+        $typeCertificate->scope_certificate = $request->scope_certificate;
         $typeCertificate->save();
 
         return response()->json([
@@ -39,6 +41,7 @@ class TypeCertificateController extends Controller
                 'id' => $typeCertificate->id_type_certificate,
                 'type_certificate' => $typeCertificate->type_certificate,
                 'description_certificate' => $typeCertificate->description_certificate,
+                'scope_certificate' => $typeCertificate->scope_certificate,
             ]
         ]);
     }
@@ -50,10 +53,12 @@ class TypeCertificateController extends Controller
         $request->validate([
             'type_certificate' => 'required|max:255',
             'description_certificate' => 'required',
+            'scope_certificate' => 'required',
         ]);
 
         $typeCertificate->type_certificate = $request->type_certificate;
         $typeCertificate->description_certificate = $request->description_certificate;
+        $typeCertificate->scope_certificate = $request->scope_certificate;
         $typeCertificate->save();
 
         return response()->json([
@@ -62,6 +67,7 @@ class TypeCertificateController extends Controller
                 'id' => $typeCertificate->id_type_certificate,
                 'type_certificate' => $typeCertificate->type_certificate,
                 'description_certificate' => $typeCertificate->description_certificate,
+                'scope_certificate' => $typeCertificate->scope_certificate,
             ]
         ]);
     }

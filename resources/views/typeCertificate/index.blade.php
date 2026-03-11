@@ -19,6 +19,7 @@
                             <th>No</th>
                             <th>Type Certificate</th>
                             <th>Description Certificate</th>
+                            <th>Scope Certificate</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -28,12 +29,9 @@
                             <td>{{ $key + 1 }}</td>
                             <td>{{ $row->type_certificate }}</td>
                             <td>{{ $row->description_certificate }}</td>
+                            <td>{{ $row->scope_certificate }}</td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    {{-- <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
-                                        data-bs-target="#typeCertificateModal{{ $row->id_type_certificate }}">
-                                        <i class="feather-eye me-1"></i> Detail
-                                    </button> --}}
                                     <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
                                         data-bs-target="#updateTypeCertificateModal{{ $row->id_type_certificate }}">
                                         <i class="feather-edit me-1"></i> Edit
@@ -80,6 +78,11 @@
                                 <input type="text" name="description_certificate" class="form-control">
                                 <span class="text-danger small error-text" id="error_description_cetificate"></span>
                             </div>
+                            <div class="mb-6">
+                                <label class="form-label">Scope Certificate</label>
+                                <input type="text" name="scope_certificate" class="form-control">
+                                <span class="text-danger small error-text" id="error_scope_cetificate"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -117,6 +120,11 @@
                                 <label class="form-label">Description Certificate</label>
                                 <input type="text" name="description_certificate" value="{{ $row->description_certificate }}" class="form-control">
                                 <span class="text-danger small error-text" id="error_description_certificate_{{ $row->id_type_certificate }}"></span>
+                            </div>
+                            <div class="mb-6">
+                                <label class="form-label">Scope Certificate</label>
+                                <input type="text" name="scope_certificate" value="{{ $row->scope_certificate }}" class="form-control">
+                                <span class="text-danger small error-text" id="error_scope_certificate_{{ $row->id_type_certificate }}"></span>
                             </div>
                         </div>
                     </div>
@@ -173,72 +181,76 @@ $(document).ready(function() {
     });
 
     $('#createTypeCertificateForm').submit(function(e){
-        e.preventDefault();
-        let form = $(this);
-        let formData = new FormData(this);
-        form.find('.error-text').text('');
+    e.preventDefault();
 
-        $.ajax({
-            url: form.attr('action'),
-            method: form.attr('method'),
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(res){
+    let form = $(this);
+    let formData = new FormData(this);
+    form.find('.error-text').text('');
 
-                $('#createTypeCertificateModal').modal('hide');
-                form[0].reset();
-                let data = res.data;
-                let actionButtons = `
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-sm btn-warning"
-                            data-bs-toggle="modal"
-                            data-bs-target="#updateTypeCertificateModal${data.id}">
-                            <i class="feather-edit me-1"></i> Edit
-                        </button>
-                        <button type="button"
-                            class="btn btn-sm btn-danger deleteTypeCertificateBtn"
-                            data-url="/type-certificate/${data.id}"
-                            data-id="${data.id}">
-                            <i class="feather-trash-2 me-1"></i> Delete
-                        </button>
-                    </div>
-                `;
+    $.ajax({
+        url: form.attr('action'),
+        method: form.attr('method'),
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(res){
 
-                let rowNode = table.row.add([
-                    table.rows().count() + 1,
-                    data.type_certificate,
-                    data.description_certificate,
-                    actionButtons
-                ]).draw(false).node();
+            $('#createTypeCertificateModal').modal('hide');
+            form[0].reset();
 
-                $(rowNode).attr('id', 'typeCertificateRow' + data.id);
+            let data = res.data;
 
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Created!',
-                    text: res.message,
-                    timer: 1500,
-                    showConfirmButton: false
+            let actionButtons = `
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-warning"
+                        data-bs-toggle="modal"
+                        data-bs-target="#updateTypeCertificateModal${data.id}">
+                        <i class="feather-edit me-1"></i> Edit
+                    </button>
+
+                    <button type="button"
+                        class="btn btn-sm btn-danger deleteTypeCertificateBtn"
+                        data-url="/type-certificate/${data.id}"
+                        data-id="${data.id}">
+                        <i class="feather-trash-2 me-1"></i> Delete
+                    </button>
+                </div>
+            `;
+
+            let rowNode = table.row.add([
+                table.rows().count() + 1,
+                data.type_certificate,
+                data.description_certificate,
+                data.scope_certificate,
+                actionButtons
+            ]).draw(false).node();
+
+            $(rowNode).attr('id', 'typeCertificateRow' + data.id);
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Created!',
+                text: res.message,
+                timer: 1500,
+                showConfirmButton: false
+            });
+        },
+        error: function(err){
+            if(err.status === 422){
+                let errors = err.responseJSON.errors;
+                $.each(errors, function(key,val){
+                    $('#error_'+key).text(val[0]);
                 });
-            },
-            error: function(err){
-                if(err.status === 422){
-                    let errors = err.responseJSON.errors;
-                    $.each(errors, function(key,val){
-                        $('#error_'+key).text(val[0]);
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'Server error occurred.'
-                    });
-                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Server error occurred.'
+                });
             }
-        });
+        }
     });
-
+});
 
     $('.updateTypeCertificateForm').submit(function(e){
         e.preventDefault();
@@ -259,13 +271,15 @@ $(document).ready(function() {
                 $('#updateTypeCertificateModal'+id).modal('hide');
 
                 let row = $('#typeCertificateRow'+id);
+                let rowData = table.row(row).data();
 
                 // Update kolom langsung
                 table.row(row).data([
-                    table.row(row).index() + 1,
+                    rowData[0],
                     res.data.type_certificate,
                     res.data.description_certificate,
-                    row.find('td:eq(3)').html()
+                    res.data.scope_certificate,
+                    rowData[4]
                 ]).draw(false);
 
                 Swal.fire({

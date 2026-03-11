@@ -32,8 +32,8 @@
                             <td>{{ $row->company->name_company }}</td>
                             <td>{{ $row->type->type_certificate }}</td>
                             <td>{{ $row->number_certificate }}</td>
-                            <td>{{ $row->issues_date }}</td>
-                            <td>{{ $row->expired_date }}</td>
+                            <td>{{ $row->issues_date_formatted }}</td>
+                            <td>{{ $row->expired_date_formatted }}</td>
                             <td>
                                 <div class="d-flex gap-2">
                                     <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
@@ -240,11 +240,11 @@
                 </div>
                 <div class="row mb-3 py-2 border-bottom" style="transition: background 0.3s;" onmouseover="this.style.background='#f8f9fa';" onmouseout="this.style.background='transparent';">
                     <div class="col-md-4 fw-bold">Issues Date</div>
-                    <div class="col-md-8">{{ $row->issues_date }}</div>
+                    <div class="col-md-8">{{ $row->issues_date_formatted }}</div>
                 </div>
                 <div class="row mb-3 py-2 border-bottom" style="transition: background 0.3s;" onmouseover="this.style.background='#f8f9fa';" onmouseout="this.style.background='transparent';">
                     <div class="col-md-4 fw-bold">Expired Date</div>
-                    <div class="col-md-8">{{ $row->expired_date }}</div>
+                    <div class="col-md-8">{{ $row->expired_date_formatted }}</div>
                 </div>
                 <div class="row mb-3 py-2 border-bottom"
                     style="transition: background 0.3s;"
@@ -253,8 +253,8 @@
                     
                     <div class="col-md-4 fw-bold">QR Code</div>
                     <div class="col-md-8">
-                        {!! QrCode::size(150)->generate(route('certification.verify', $row->barcode_certificate)) !!}
-                        <div class="mt-2">{{ $row->barcode_certificate }}</div>
+                        <img src="data:image/png;base64,{{ $row->qrcode }}">
+                    <div class="mt-2">{{ $row->barcode_certificate }}</div>
                     </div>
                 </div>
             </div>
@@ -284,6 +284,7 @@ $(document).ready(function() {
 
 $('#createCertificationForm').submit(function(e){
     e.preventDefault();
+
     let form = $(this);
     let formData = new FormData(this);
     form.find('.error-text').text('');
@@ -299,23 +300,27 @@ $('#createCertificationForm').submit(function(e){
             $('#createCertificationModal').modal('hide');
             form[0].reset();
 
-            let data = res.data; // Certification data
+            let data = res.data;
 
             let actionButtons = `
                 <div class="d-flex gap-2">
                     <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
                         data-bs-target="#certificationModal${data.id_certification}">
-                        <i class="feather-eye me-1"></i> Detail
+                        Detail
                     </button>
                     <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
                         data-bs-target="#updateCertificationModal${data.id_certification}">
-                        <i class="feather-edit me-1"></i> Edit
+                        Edit
                     </button>
                     <button type="button" class="btn btn-sm btn-danger deleteCertificationBtn"
                         data-url="/certification/${data.id_certification}"
                         data-id="${data.id_certification}">
-                        <i class="feather-trash-2 me-1"></i> Delete
-                    </button>                                   
+                        Delete
+                    </button>
+                    <a href="/certification/generate-pdf/${data.id_certification}"
+                        class="btn btn-sm btn-secondary" target="_blank">
+                        PDF
+                    </a>
                 </div>
             `;
 
@@ -324,8 +329,8 @@ $('#createCertificationForm').submit(function(e){
                 data.company ? data.company.name_company : '',
                 data.type ? data.type.type_certificate : '',
                 data.number_certificate,
-                data.issues_date,
-                data.expired_date,
+                data.issues_date_formatted,
+                data.expired_date_formatted,
                 actionButtons
             ]).draw(false).node();
 
@@ -376,15 +381,16 @@ $('#createCertificationForm').submit(function(e){
                 $('#updateCertificationModal'+id).modal('hide');
 
                 let row = $('#certificationRow'+id);
+                let rowData = table.row(row).data();
 
                 table.row(row).data([
-                    table.row(row).index() + 1,
+                    rowData[0],
                     res.data.company ? res.data.company.name_company : '',
                     res.data.type ? res.data.type.type_certificate : '',
                     res.data.number_certificate,
-                    res.data.issues_date,
-                    res.data.expired_date,
-                    row.find('td:eq(6)').html()
+                    res.data.issues_date_formatted,
+                    res.data.expired_date_formatted,
+                    rowData[6]
                 ]).draw(false);
 
                 Swal.fire({
@@ -417,7 +423,7 @@ $('#createCertificationForm').submit(function(e){
 
         let url = $(this).data('url');
         let id = $(this).data('id');
-        let row = $('#companyRow' + id);
+        let row = $('#certificationRow' + id);
 
         Swal.fire({
             title: 'Are you sure?',

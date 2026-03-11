@@ -269,23 +269,29 @@ $(document).ready(function() {
 
                 $('#createCompanyModal').modal('hide');
                 form[0].reset();
+
                 let data = res.data;
+
                 let actionButtons = `
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
-                            data-bs-target="#companyModal{{ $row->id_company }}">
-                            <i class="feather-eye me-1"></i> Detail
-                        </button>
-                        <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                            data-bs-target="#updateCompanyModal{{ $row->id_company }}">
-                            <i class="feather-edit me-1"></i> Edit
-                        </button>
-                        <button type="button" class="btn btn-sm btn-danger deleteCompanyBtn"
-                            data-url="/company/${data.id}"
-                            data-id="${data.id}">
-                            <i class="feather-trash-2 me-1"></i> Delete
-                        </button>                                   
-                    </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
+                        data-bs-target="#companyModal${data.id_company}">
+                        <i class="feather-eye me-1"></i> Detail
+                    </button>
+
+                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                        data-bs-target="#updateCompanyModal${data.id_company}">
+                        <i class="feather-edit me-1"></i> Edit
+                    </button>
+
+                    <button 
+                        type="button"
+                        class="btn btn-sm btn-danger deleteCompanyBtn"
+                        data-url="/company/${data.id_company}"
+                        data-id="${data.id_company}">
+                        <i class="feather-trash-2 me-1"></i> Delete
+                    </button>                                   
+                </div>
                 `;
 
                 let rowNode = table.row.add([
@@ -299,7 +305,7 @@ $(document).ready(function() {
                     actionButtons
                 ]).draw(false).node();
 
-                $(rowNode).attr('id', 'companyRow' + data.id);
+                $(rowNode).attr('id', 'companyRow' + data.id_company);
 
                 Swal.fire({
                     icon: 'success',
@@ -346,15 +352,16 @@ $(document).ready(function() {
                 $('#updateCompanyModal'+id).modal('hide');
 
                 let row = $('#companyRow'+id);
+                let rowData = table.row(row).data();
 
                 table.row(row).data([
-                    table.row(row).index() + 1,
+                    rowData[0],
                     res.data.name_company,
                     res.data.phone_company,
                     res.data.email_company,
                     res.data.logo_company ? `<img src="/storage/${res.data.logo_company}" width="50" class="img-thumbnail">`
                         : '',
-                    row.find('td:eq(5)').html()
+                    rowData[5]
                 ]).draw(false);
 
                 Swal.fire({

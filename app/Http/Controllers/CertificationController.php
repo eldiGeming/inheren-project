@@ -16,18 +16,40 @@ class CertificationController extends Controller
      */
     public function index()
     {
+        // Ambil company yang tidak dihapus
         $companies = Company::where('is_deleted', 0)->get();
-        $types = TypeCertificate::where('is_deleted', 0)->get();
-        $allCertification = Certification::with(['company', 'type'])->where('is_deleted', 0)->get();
 
-        return view('certification.index', compact('allCertification', 'companies', 'types'));
+        // Ambil type certificate yang tidak dihapus
+        $types = TypeCertificate::where('is_deleted', 0)->get();
+        // Ambil semua certification beserta relasi
+        $allCertification = Certification::with(['company', 'type'])
+            ->where('is_deleted', 0)
+            ->get()
+            ->map(function ($cert) {
+                // Format tanggal
+                $cert->issues_date_formatted = Carbon::parse($cert->issues_date)->format('d-F-Y');
+                $cert->expired_date_formatted = Carbon::parse($cert->expired_date)->format('d-F-Y');
+                $verifyUrl = route('certification.verify', $cert->barcode_certificate);
+                $cert->qrcode = base64_encode(
+                QrCode::format('png')
+                    ->size(250)
+                    ->errorCorrection('H')
+                    ->merge(public_path('assets/images/logo-abbr.png'), 0.25, true)
+                    ->generate($verifyUrl)
+            );
+                return $cert;
+            });
+
+        return view('certification.index', [
+            'allCertification' => $allCertification,
+            'companies' => $companies,
+            'types' => $types
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
+        // Validasi
         $request->validate([
             'id_company' => 'required|exists:companies,id_company',
             'id_type_certificate' => 'required|exists:type_certificates,id_type_certificate',
@@ -37,24 +59,48 @@ class CertificationController extends Controller
         $issuesDate = Carbon::parse($request->issues_date);
         $expiredDate = $issuesDate->copy()->addYear();
 
-        $number = 'CERT-' . date('Y') . '-' . rand(1000, 9999);
+        // Generate nomor urut terbaru untuk id_company dan id_type_certificate
+        $lastCert = Certification::where('id_company', $request->id_company)
+            ->where('id_type_certificate', $request->id_type_certificate)
+            ->orderBy('id_certification', 'desc')
+            ->first();
 
+        $lastNumber = $lastCert ? intval(substr($lastCert->number_certificate, 0, 3)) : 0;
+        $nomorUrut = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT); // 3 digit
+
+        // id_company 2 digit
+        $idCompanyPadded = str_pad($request->id_company, 2, '0', STR_PAD_LEFT);
+
+        // id_type_certificate 1 digit
+        $idTypePadded = $request->id_type_certificate; // as is, 1 digit
+
+        // bulan dan tahun 2 digit
+        $month = $issuesDate->format('m');
+        $year = $issuesDate->format('y');
+
+        // Gabungkan menjadi nomor 10 digit
+        $number = $nomorUrut . $idCompanyPadded . $idTypePadded . $month . $year;
+
+        // Simpan sertifikasi
         $certification = Certification::create([
             'id_company' => $request->id_company,
             'id_type_certificate' => $request->id_type_certificate,
             'number_certificate' => $number,
             'issues_date' => $issuesDate,
             'expired_date' => $expiredDate,
-            'barcode_certificate' => $number, // ✅ hanya simpan kode
+            'barcode_certificate' => $number, 
         ]);
 
         $certification->load(['company', 'type']);
+        $certification->issues_date_formatted = $issuesDate->format('d-F-Y');
+        $certification->expired_date_formatted = $expiredDate->format('d-F-Y');
 
         return response()->json([
             'message' => 'Certification created successfully!',
             'data' => $certification
         ]);
     }
+
 
     public function update(Request $request, $id)
     {
@@ -117,7 +163,18 @@ class CertificationController extends Controller
             return view('certification.verify-not-found');
         }
 
-        return view('certification.verify', compact('certification'));
+        $verifyUrl = route('certification.verify', $code);
+
+        // generate QR dengan logo di tengah
+        $qrCode = base64_encode(
+            QrCode::format('png')
+                ->size(250)
+                ->errorCorrection('H')
+                ->merge(public_path('assets/images/logo-abbr.png'), 0.25, true)
+                ->generate($verifyUrl)
+        );
+
+        return view('certification.verify', compact('certification', 'qrCode'));
     }
 
     public function generatePdf($id)
@@ -145,7 +202,7 @@ class CertificationController extends Controller
         $certificateType = strtoupper($certification->type->type_certificate);
         $certificateDescription = $certification->type->description_certificate ?? '';
         $certificateNumber = $certification->number_certificate;
-        $scope = $certification->scope ?? '';
+        $scopeCertificate = $certification->type->scope_certificate ?? '';
 
         $issueDate = Carbon::parse($certification->issues_date)->format('d F Y');
         $expiredDate = Carbon::parse($certification->expired_date)->format('d F Y');
@@ -156,47 +213,47 @@ class CertificationController extends Controller
         $pdf->SetTextColor(0,0,0);
         $pdf->SetFont('helvetica', '', 13);
         $pdf->SetXY(20, 85);
-        $pdf->Cell(170, 8, 'This is to certify that', 0, 1, 'R');
+        $pdf->Cell(165, 8, 'This is to certify that', 0, 1, 'R');
 
         // COMPANY NAME (RED BIG)
         $pdf->SetTextColor(200, 0, 0);
         $pdf->SetFont('helvetica', 'B', 22);
         $pdf->SetXY(20, 95);
-        $pdf->MultiCell(170, 10, $companyName, 0, 'R');
+        $pdf->MultiCell(165, 10, $companyName, 0, 'R');
 
         // ADDRESS (RED SMALL)
         $pdf->SetFont('helvetica', '', 10);
         $pdf->SetXY(30, 108);
-        $pdf->MultiCell(150, 5, $companyAddress, 0, 'R');
+        $pdf->MultiCell(155, 5, $companyAddress, 0, 'R');
 
         // Compliance text
         $pdf->SetTextColor(0,0,0);
         $pdf->SetFont('helvetica', '', 13);
         $pdf->SetXY(20, 125);
-        $pdf->Cell(170, 8, 'Which complies with the requirements of', 0, 1, 'R');
+        $pdf->Cell(165, 8, 'Which complies with the requirements of', 0, 1, 'R');
 
         // ISO TYPE (RED BOLD)
         $pdf->SetTextColor(200, 0, 0);
         $pdf->SetFont('helvetica', 'B', 18);
         $pdf->SetXY(20, 135);
-        $pdf->MultiCell(170, 8, $certificateType, 0, 'R');
+        $pdf->MultiCell(165, 8, $certificateType, 0, 'R');
 
         // DESCRIPTION (SMALL BLACK)
         $pdf->SetTextColor(0,0,0);
         $pdf->SetFont('helvetica', '', 11);
         $pdf->SetXY(20, 145);
-        $pdf->MultiCell(170, 6, $certificateDescription, 0, 'R');
+        $pdf->MultiCell(165, 6, $certificateDescription, 0, 'R');
 
         // Scope Title
         $pdf->SetFont('helvetica', '', 13);
-        $pdf->SetXY(20, 158);
-        $pdf->Cell(170, 8, 'For the following activities', 0, 1, 'R');
+        $pdf->SetXY(20, 162);
+        $pdf->Cell(165, 4, 'For the following activities', 0, 1, 'R');
 
         // Scope Activities (RED MULTILINE)
         $pdf->SetTextColor(200, 0, 0);
         $pdf->SetFont('helvetica', '', 10);
         $pdf->SetXY(30, 168);
-        $pdf->MultiCell(150, 5, $scope, 0, 'R');
+        $pdf->MultiCell(155, 5, $scopeCertificate, 0, 'R');
 
         // ================= FOOTER AREA =================
 
@@ -211,18 +268,35 @@ class CertificationController extends Controller
 
         $pdf->SetX(130);
         $pdf->Cell(60, 6, 'Expired: ' . $expiredDate, 0, 1, 'R');
+
         // ================= QR CODE =================
         $verifyUrl = route('certification.verify', $certificateNumber);
+        $qrX = 164;
+        $qrY = 255;
+        $qrSize = 25;
 
         $pdf->write2DBarcode(
             $verifyUrl,
             'QRCODE,H',
-            170,
-            255,
-            25,
-            25,
+            $qrX,
+            $qrY,
+            $qrSize,
+            $qrSize,
             [],
             'N'
+        );
+
+        $logoSize = 8; // ukuran logo
+        $logoX = $qrX + ($qrSize / 2) - ($logoSize / 2);
+        $logoY = $qrY + ($qrSize / 2) - ($logoSize / 2);
+
+        $pdf->Image(
+            public_path('assets/images/logo-abbr.png'), // logo kecil
+            $logoX,
+            $logoY,
+            $logoSize,
+            $logoSize,
+            'PNG'
         );
 
         return $pdf->Output('certificate-'.$certificateNumber.'.pdf', 'I');

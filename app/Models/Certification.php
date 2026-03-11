@@ -17,6 +17,7 @@ class Certification extends Model
         'issues_date',
         'expired_date',
         'barcode_certificate',
+        'is_deleted',
         'created_by',
         'created_at',
         'updated_by',
