@@ -222,6 +222,7 @@ class CertificationController extends Controller
         $pdf->MultiCell(165, 10, $companyName, 0, 'R');
 
         // ADDRESS (RED SMALL)
+        $pdf->SetTextColor(0,0,0);
         $pdf->SetFont('helvetica', '', 12);
         $pdf->SetXY(30, 105);
         $pdf->MultiCell(155, 5, $companyAddress, 0, 'R');
@@ -239,7 +240,7 @@ class CertificationController extends Controller
         $pdf->MultiCell(165, 8, $certificateType, 0, 'R');
 
         // DESCRIPTION (SMALL BLACK)
-        $pdf->SetTextColor(200, 0, 0);
+        $pdf->SetTextColor(0, 0, 0);
         $pdf->SetFont('helvetica', '', 12);
         $pdf->SetXY(20, 145);
         $pdf->MultiCell(165, 4, $certificateDescription, 0, 'R');
@@ -251,7 +252,7 @@ class CertificationController extends Controller
         $pdf->Cell(165, 4, 'For the following activities', 0, 1, 'R');
 
         // Scope Activities (RED MULTILINE)
-        $pdf->SetTextColor(200, 0, 0);
+        $pdf->SetTextColor(0, 0, 0);
         $pdf->SetFont('helvetica', '', 12);
         $pdf->SetXY(30, 168);
         $pdf->MultiCell(155, 5, $scopeCertificate, 0, 'R');
@@ -259,91 +260,112 @@ class CertificationController extends Controller
         // ================= FOOTER AREA =================
 
         $pdf->SetFont('helvetica', '', 9);
+    $pdf->SetTextColor(0,0,0);
 
-        $pdf->SetTextColor(0,0,0);
-        $pdf->SetXY(40, 197);
-        $pdf->Cell(25, 6, 'Certificate No: ', 0, 0, 'L');
+    // ===============================
+    // QR VERIFY DI KIRI BAWAH
+    // ===============================
+    $verifyUrl = route('certification.verify', $certificateNumber);
 
-        $pdf->SetTextColor(200,0,0);
-        $pdf->Cell(25, 6, $certificateNumber, 0, 1, 'L');
+    $qrX = 40;
+    $qrY = 228;
+    $qrSize = 25;
 
-        // Dates (Right Bottom)
-        $pdf->SetXY(130, 195);
-        $pdf->Cell(55, 10, 'Issued: ' . $issueDate, 0, 2, 'R');
+    $pdf->write2DBarcode(
+        $verifyUrl,
+        'QRCODE,H',
+        $qrX,
+        $qrY,
+        $qrSize,
+        $qrSize,
+        [],
+        'N'
+    );
 
-        $pdf->SetX(130);
-        $pdf->Cell(55, 6, 'Expires: ' . $expiredDate, 0, 1, 'R');
+    // LOGO DI TENGAH QR
+    $logoSize = 8;
+    $logoX = $qrX + ($qrSize / 2) - ($logoSize / 2);
+    $logoY = $qrY + ($qrSize / 2) - ($logoSize / 2);
 
-        $pdf->SetX(130);
-        $pdf->Cell(55, 6, 'Originally Certified: ' . $issueDate, 0, 1, 'R');
+    $pdf->Image(
+        public_path('assets/images/logo-abbr.png'),
+        $logoX,
+        $logoY,
+        $logoSize,
+        $logoSize,
+        'PNG'
+    );
 
-        $verifyUrl = route('certification.verify', $certificateNumber);
+    // ===============================
+    // CERTIFICATE NO DI BAWAH QR
+    // ===============================
+    $pdf->SetXY($qrX - 1, $qrY + $qrSize - 2);
 
-        $qrX = 159;
-        $qrY = 220;
-        $qrSize = 25;
+    $pdf->SetTextColor(0,0,0);
+    $pdf->SetFont('helvetica', '', 7);
+    $pdf->Cell(25,10,'Certificate No: '. $certificateNumber,0,2,'L');
 
-        $pdf->write2DBarcode(
-            $verifyUrl,
-            'QRCODE,H',
-            $qrX,
-            $qrY,
-            $qrSize,
-            $qrSize,
-            [],
-            'N'
-        );
+    // ===============================
+    // DATES (KANAN BAWAH)
+    // ===============================
+    $pdf->SetTextColor(0,0,0);
+    $pdf->SetFont('helvetica','',9);
 
-        // LOGO DI TENGAH QR VERIFY
-        $logoSize = 8;
-        $logoX = $qrX + ($qrSize / 2) - ($logoSize / 2);
-        $logoY = $qrY + ($qrSize / 2) - ($logoSize / 2);
+    $pdf->SetXY(130, 195);
+    $pdf->Cell(55, 6, 'Issued: ' . $issueDate, 0, 2, 'R');
 
-        $pdf->Image(
-            public_path('assets/images/logo-abbr.png'),
-            $logoX,
-            $logoY,
-            $logoSize,
-            $logoSize,
-            'PNG'
-        );
+    $pdf->SetX(130);
+    $pdf->Cell(55, 6, 'Expires: ' . $expiredDate, 0, 1, 'R');
 
-        $pdf->SetTextColor(0,0,0);
-        $pdf->SetFont('helvetica', 'BI', 9);
-        $pdf->SetXY(20, 260);
-        $pdf->Cell(165, 5, 'Authorised by', 0, 1, 'R');
+    $pdf->SetX(130);
+    $pdf->Cell(55, 6, 'Originally Certified: ' . $issueDate, 0, 1, 'R');
 
-        $qrWebX = 170;
-        $qrWebY = 268;
-        $qrWebSize = 15;
 
-        $websiteUrl = 'https://inheren.com/';
+    $pdf->SetFont('helvetica', 'BI', 9);
+    $pdf->SetXY(20, 220);
+    $pdf->Cell(165, 5, 'Authorised by', 0, 1, 'R');
 
-        $pdf->write2DBarcode(
-            $websiteUrl,
-            'QRCODE,H',
-            $qrWebX,
-            $qrWebY,
-            $qrWebSize,
-            $qrWebSize,
-            [],
-            'N'
-        );
 
-        $textX = $qrWebX - 70;
-        $textY = $qrWebY - 1;
+    $qrWebX = 158;
+    $qrWebY = 230;
+    $qrWebSize = 25;
+    $signatureUrl = asset('storage/sign/sign_director.png');
 
-        $pdf->SetFont('helvetica', '', 8);
-        $pdf->SetTextColor(0,0,0);
+    $pdf->write2DBarcode(
+        $signatureUrl,
+        'QRCODE,H',
+        $qrWebX,
+        $qrWebY,
+        $qrWebSize,
+        $qrWebSize,
+        [],
+        'N'
+    );
 
-        $text = "PLAZA MUTIARA Mega Kuningan Lantai 8
-        Jl. DR. Ide Anak Agung Gde Agung Kav. E.1.2 No. 1 & 2
-        Jakarta Selatan - DKI Jakarta - Indonesia
-        www.inheren.com | info@inheren.com";
+    // GARIS DAN DIRECTOR
+    $pdf->SetFont('helvetica','',9);
+    $pdf->SetX(120);
+    $pdf->Cell(58,5,'Director',0,1,'R');
 
-        $pdf->SetXY($textX, $textY);
-        $pdf->MultiCell(65, 4, $text, 0, 'R');
-        
+
+$pdf->SetFont('helvetica', '', 8);
+$pdf->SetTextColor(0,0,0);
+
+$text = "PLAZA MUTIARA Mega Kuningan Lantai 8
+Jl. DR. Ide Anak Agung Gde Agung Kav. E.1.2 No. 1 & 2
+Jakarta Selatan - DKI Jakarta - Indonesia
+www.inheren.com | info@inheren.com";
+
+// posisi bawah halaman
+$pdf->SetXY(20, 275);
+
+$pdf->MultiCell(
+    170,   // lebar hampir full page
+    4,
+    $text,
+    0,
+    'C'    // center supaya seperti footer sertifikat
+);
         return $pdf->Output('certificate-'.$certificateNumber.'.pdf', 'I');
     }
 }
