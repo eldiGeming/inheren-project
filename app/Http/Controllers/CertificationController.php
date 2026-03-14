@@ -343,7 +343,6 @@ class CertificationController extends Controller
 
         $pdf->SetXY($textX, $textY);
         $pdf->MultiCell(65, 4, $text, 0, 'R');
-        // ================= QR CODE =================
         
         return $pdf->Output('certificate-'.$certificateNumber.'.pdf', 'I');
     }
