@@ -12,58 +12,81 @@
         </div>
 
         <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover" id="certificationList">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Company Name</th>
-                            <th>Type Certificate</th>
-                            <th>Number Certicate</th>
-                            <th>Issues Date</th>
-                            <th>Expired Date</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($allCertification as $key => $row)
-                        <tr id="certificationRow{{ $row->id_certification }}">
-                            <td>{{ $key + 1 }}</td>
-                            <td>{{ $row->company->name_company }}</td>
-                            <td>{{ $row->type->type_certificate }}</td>
-                            <td>{{ $row->number_certificate }}</td>
-                            <td>{{ $row->issues_date_formatted }}</td>
-                            <td>{{ $row->expired_date_formatted }}</td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
-                                        data-bs-target="#certificationModal{{ $row->id_certification }}">
-                                        <i class="feather-eye me-1"></i> Detail
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                        data-bs-target="#updateCertificationModal{{ $row->id_certification }}">
-                                        <i class="feather-edit me-1"></i> Edit
-                                    </button>
-                                    <button 
-                                        type="button"
-                                        class="btn btn-sm btn-danger deleteCertificationBtn"
-                                        data-url="{{ route('certification.destroy', $row->id_certification) }}"
-                                        data-id="{{ $row->id_certification }}">
-                                        <i class="feather-trash-2 me-1"></i> Delete
-                                    </button>    
-                                        <a href="{{ route('certification.generatePdf', $row->id_certification) }}"
-                                        class="btn btn-sm btn-secondary"
-                                        target="_blank">
-                                            <i class="bi bi-file-earmark-pdf me-1"></i> PDF
-                                        </a>        
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
+   <div class="card-body p-0">
+    <div class="table-responsive">
+        <table class="table table-hover table-borderless align-middle mb-0" 
+               id="certificationList" 
+               style="min-width: 900px;">
+            
+            <thead class="text-center">
+                <tr>
+                    <th>No</th>
+                    <th>Company Name</th>
+                    <th>Type Certificate</th>
+                    <th>Number Certificate</th>
+                    <th>Issues Date</th>
+                    <th>Expired Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach($allCertification as $key => $row)
+                <tr id="certificationRow{{ $row->id_certification }}">
+
+                    <td class="text-center">{{ $key + 1 }}</td>
+
+                    <td>{{ $row->company->name_company }}</td>
+
+                    <td>{{ $row->type->type_certificate }}</td>
+
+                    <td>{{ $row->number_certificate }}</td>
+
+                    <td class="text-center">{{ $row->issues_date_formatted }}</td>
+
+                    <td class="text-center">{{ $row->expired_date_formatted }}</td>
+
+                    <td>
+                        <div class="d-flex gap-1 flex-wrap">
+
+                            <button type="button"
+                                class="btn btn-sm btn-info text-white"
+                                data-bs-toggle="modal"
+                                data-bs-target="#certificationModal{{ $row->id_certification }}">
+                                <i class="feather-eye"></i>
+                            </button>
+
+                            <button type="button"
+                                class="btn btn-sm btn-warning"
+                                data-bs-toggle="modal"
+                                data-bs-target="#updateCertificationModal{{ $row->id_certification }}">
+                                <i class="feather-edit"></i>
+                            </button>
+
+                            <button 
+                                type="button"
+                                class="btn btn-sm btn-danger deleteCertificationBtn"
+                                data-url="{{ route('certification.destroy', $row->id_certification) }}"
+                                data-id="{{ $row->id_certification }}">
+                                <i class="feather-trash-2"></i>
+                            </button>
+
+                            <a href="{{ route('certification.generatePdf', $row->id_certification) }}"
+                               class="btn btn-sm btn-secondary"
+                               target="_blank">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                            </a>
+
+                        </div>
+                    </td>
+
+                </tr>
+                @endforeach
+            </tbody>
+
+        </table>
+    </div>
+</div>
     </div>
 </div>
 
@@ -306,20 +329,16 @@ $('#createCertificationForm').submit(function(e){
                 <div class="d-flex gap-2">
                     <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
                         data-bs-target="#certificationModal${data.id_certification}">
-                        Detail
                     </button>
                     <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
                         data-bs-target="#updateCertificationModal${data.id_certification}">
-                        Edit
                     </button>
                     <button type="button" class="btn btn-sm btn-danger deleteCertificationBtn"
                         data-url="/certification/${data.id_certification}"
                         data-id="${data.id_certification}">
-                        Delete
                     </button>
                     <a href="/certification/generate-pdf/${data.id_certification}"
                         class="btn btn-sm btn-secondary" target="_blank">
-                        PDF
                     </a>
                 </div>
             `;

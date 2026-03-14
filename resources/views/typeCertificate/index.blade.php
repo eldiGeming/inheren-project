@@ -3,6 +3,33 @@
 @section('title', 'Type Certificate')
 
 @section('content')
+<style>
+#typeCertificateList {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#typeCertificateList td,
+#typeCertificateList th{
+    vertical-align: middle;
+}
+
+.wrap-text{
+    white-space: normal !important;
+    word-break: break-word;
+}
+
+.action-col{
+    width:170px;
+    white-space: nowrap;
+}
+
+.col-type{ width:20%; }
+.col-desc{ width:30%; }
+.col-scope{ width:30%; }
+.col-no{ width:5%; }
+</style>
+
 <div class="main-content">
     <div class="card stretch stretch-full">
         <div class="d-flex justify-content-end p-3">
@@ -13,38 +40,53 @@
 
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover" id="typeCertificateList">
+                <table class="table table-hover" id="typeCertificateList" style="table-layout: fixed; width:100%;">
                     <thead>
                         <tr>
-                            <th>No</th>
-                            <th>Type Certificate</th>
-                            <th>Description Certificate</th>
-                            <th>Scope Certificate</th>
-                            <th>Action</th>
+                            <th class="col-no">No</th>
+                            <th class="col-type">Type Certificate</th>
+                            <th class="col-desc">Description Certificate</th>
+                            <th class="col-scope">Scope Certificate</th>
+                            <th class="action-col">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($allTypeCertificate as $key => $row)
                         <tr id="typeCertificateRow{{ $row->id_type_certificate }}">
-                            <td>{{ $key + 1 }}</td>
-                            <td>{{ $row->type_certificate }}</td>
-                            <td>{{ $row->description_certificate }}</td>
-                            <td>{{ $row->scope_certificate }}</td>
-                            <td>
+                            
+                            <td class="col-no">{{ $key + 1 }}</td>
+
+                            <td class="wrap-text col-type">
+                                {{ $row->type_certificate }}
+                            </td>
+
+                            <td class="wrap-text col-desc">
+                                {{ $row->description_certificate }}
+                            </td>
+
+                            <td class="wrap-text col-scope">
+                                {{ $row->scope_certificate }}
+                            </td>
+
+                            <td class="action-col">
                                 <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                    <button type="button"
+                                        class="btn btn-sm btn-warning"
+                                        data-bs-toggle="modal"
                                         data-bs-target="#updateTypeCertificateModal{{ $row->id_type_certificate }}">
-                                        <i class="feather-edit me-1"></i> Edit
+                                        <i class="feather-edit me-1"></i>
                                     </button>
-                                    <button 
+
+                                    <button
                                         type="button"
                                         class="btn btn-sm btn-danger deleteTypeCertificateBtn"
                                         data-url="{{ route('type-certificate.destroy', $row->id_type_certificate) }}"
                                         data-id="{{ $row->id_type_certificate }}">
-                                        <i class="feather-trash-2 me-1"></i> Delete
+                                        <i class="feather-trash-2 me-1"></i>
                                     </button>
                                 </div>
                             </td>
+
                         </tr>
                         @endforeach
                     </tbody>
@@ -205,14 +247,14 @@ $(document).ready(function() {
                     <button type="button" class="btn btn-sm btn-warning"
                         data-bs-toggle="modal"
                         data-bs-target="#updateTypeCertificateModal${data.id}">
-                        <i class="feather-edit me-1"></i> Edit
+                        <i class="feather-edit me-1"></i>
                     </button>
 
                     <button type="button"
                         class="btn btn-sm btn-danger deleteTypeCertificateBtn"
                         data-url="/type-certificate/${data.id}"
                         data-id="${data.id}">
-                        <i class="feather-trash-2 me-1"></i> Delete
+                        <i class="feather-trash-2 me-1"></i>
                     </button>
                 </div>
             `;

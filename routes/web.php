@@ -1,14 +1,14 @@
 <?php
 
 use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CompanyProfileController;
 use App\Http\Controllers\TypeCertificateController;
 use App\Http\Controllers\CertificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('landing');
-})->name('landing');
+    return view('company-profile');
+})->name('company-profile');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -31,9 +31,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/certification/{id}', [CertificationController::class, 'destroy'])->name('certification.destroy');
     Route::get('/certification/pdf/{id}', [CertificationController::class, 'generatePdf'])->name('certification.generatePdf');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [CompanyProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [CompanyProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [CompanyProfileController::class, 'destroy'])->name('profile.destroy');
 });
     Route::get('/certification/{id}', [CertificationController::class, 'show'])->name('certification.show');
     Route::get('/verify/{code}', [CertificationController::class, 'verify'])->name('certification.verify');

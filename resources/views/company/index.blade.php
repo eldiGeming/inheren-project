@@ -40,18 +40,18 @@
                                 <div class="d-flex gap-2">
                                     <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
                                         data-bs-target="#companyModal{{ $row->id_company }}">
-                                        <i class="feather-eye me-1"></i> Detail
+                                        <i class="feather-eye me-1"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
                                         data-bs-target="#updateCompanyModal{{ $row->id_company }}">
-                                        <i class="feather-edit me-1"></i> Edit
+                                        <i class="feather-edit me-1"></i>
                                     </button>
                                     <button 
                                         type="button"
                                         class="btn btn-sm btn-danger deleteCompanyBtn"
                                         data-url="{{ route('company.destroy', $row->id_company) }}"
                                         data-id="{{ $row->id_company }}">
-                                        <i class="feather-trash-2 me-1"></i> Delete
+                                        <i class="feather-trash-2 me-1"></i>
                                     </button>                                   
                                 </div>
                             </td>
@@ -276,12 +276,12 @@ $(document).ready(function() {
                 <div class="d-flex gap-2">
                     <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
                         data-bs-target="#companyModal${data.id_company}">
-                        <i class="feather-eye me-1"></i> Detail
+                        <i class="feather-eye me-1"></i>
                     </button>
 
                     <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
                         data-bs-target="#updateCompanyModal${data.id_company}">
-                        <i class="feather-edit me-1"></i> Edit
+                        <i class="feather-edit me-1"></i>
                     </button>
 
                     <button 
@@ -289,7 +289,7 @@ $(document).ready(function() {
                         class="btn btn-sm btn-danger deleteCompanyBtn"
                         data-url="/company/${data.id_company}"
                         data-id="${data.id_company}">
-                        <i class="feather-trash-2 me-1"></i> Delete
+                        <i class="feather-trash-2 me-1"></i>
                     </button>                                   
                 </div>
                 `;

@@ -211,68 +211,76 @@ class CertificationController extends Controller
 
         // This is to certify that
         $pdf->SetTextColor(0,0,0);
-        $pdf->SetFont('helvetica', '', 13);
+        $pdf->SetFont('helvetica', 'BI', 16);
         $pdf->SetXY(20, 85);
         $pdf->Cell(165, 8, 'This is to certify that', 0, 1, 'R');
 
         // COMPANY NAME (RED BIG)
         $pdf->SetTextColor(200, 0, 0);
-        $pdf->SetFont('helvetica', 'B', 22);
-        $pdf->SetXY(20, 95);
+        $pdf->SetFont('helvetica', 'B', 15);
+        $pdf->SetXY(20, 97);
         $pdf->MultiCell(165, 10, $companyName, 0, 'R');
 
         // ADDRESS (RED SMALL)
-        $pdf->SetFont('helvetica', '', 10);
-        $pdf->SetXY(30, 108);
+        $pdf->SetFont('helvetica', '', 12);
+        $pdf->SetXY(30, 105);
         $pdf->MultiCell(155, 5, $companyAddress, 0, 'R');
 
         // Compliance text
         $pdf->SetTextColor(0,0,0);
-        $pdf->SetFont('helvetica', '', 13);
-        $pdf->SetXY(20, 125);
+        $pdf->SetFont('helvetica', 'BI', 16);
+        $pdf->SetXY(20, 127);
         $pdf->Cell(165, 8, 'Which complies with the requirements of', 0, 1, 'R');
 
         // ISO TYPE (RED BOLD)
         $pdf->SetTextColor(200, 0, 0);
-        $pdf->SetFont('helvetica', 'B', 18);
-        $pdf->SetXY(20, 135);
+        $pdf->SetFont('helvetica', 'B', 15);
+        $pdf->SetXY(20, 138);
         $pdf->MultiCell(165, 8, $certificateType, 0, 'R');
 
         // DESCRIPTION (SMALL BLACK)
-        $pdf->SetTextColor(0,0,0);
-        $pdf->SetFont('helvetica', '', 11);
+        $pdf->SetTextColor(200, 0, 0);
+        $pdf->SetFont('helvetica', '', 12);
         $pdf->SetXY(20, 145);
-        $pdf->MultiCell(165, 6, $certificateDescription, 0, 'R');
+        $pdf->MultiCell(165, 4, $certificateDescription, 0, 'R');
 
         // Scope Title
-        $pdf->SetFont('helvetica', '', 13);
-        $pdf->SetXY(20, 162);
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica', 'BI', 16);
+        $pdf->SetXY(20, 157);
         $pdf->Cell(165, 4, 'For the following activities', 0, 1, 'R');
 
         // Scope Activities (RED MULTILINE)
         $pdf->SetTextColor(200, 0, 0);
-        $pdf->SetFont('helvetica', '', 10);
+        $pdf->SetFont('helvetica', '', 12);
         $pdf->SetXY(30, 168);
         $pdf->MultiCell(155, 5, $scopeCertificate, 0, 'R');
 
         // ================= FOOTER AREA =================
 
-        // Certificate Number (Left Bottom)
         $pdf->SetFont('helvetica', '', 9);
-        $pdf->SetXY(20, 245);
-        $pdf->Cell(80, 6, 'Certificate No: ' . $certificateNumber, 0, 1, 'L');
+
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetXY(40, 197);
+        $pdf->Cell(25, 6, 'Certificate No: ', 0, 0, 'L');
+
+        $pdf->SetTextColor(200,0,0);
+        $pdf->Cell(25, 6, $certificateNumber, 0, 1, 'L');
 
         // Dates (Right Bottom)
-        $pdf->SetXY(130, 240);
-        $pdf->Cell(60, 6, 'Issued: ' . $issueDate, 0, 2, 'R');
+        $pdf->SetXY(130, 195);
+        $pdf->Cell(55, 10, 'Issued: ' . $issueDate, 0, 2, 'R');
 
         $pdf->SetX(130);
-        $pdf->Cell(60, 6, 'Expired: ' . $expiredDate, 0, 1, 'R');
+        $pdf->Cell(55, 6, 'Expires: ' . $expiredDate, 0, 1, 'R');
 
-        // ================= QR CODE =================
+        $pdf->SetX(130);
+        $pdf->Cell(55, 6, 'Originally Certified: ' . $issueDate, 0, 1, 'R');
+
         $verifyUrl = route('certification.verify', $certificateNumber);
-        $qrX = 164;
-        $qrY = 255;
+
+        $qrX = 159;
+        $qrY = 220;
         $qrSize = 25;
 
         $pdf->write2DBarcode(
@@ -286,12 +294,13 @@ class CertificationController extends Controller
             'N'
         );
 
-        $logoSize = 8; // ukuran logo
+        // LOGO DI TENGAH QR VERIFY
+        $logoSize = 8;
         $logoX = $qrX + ($qrSize / 2) - ($logoSize / 2);
         $logoY = $qrY + ($qrSize / 2) - ($logoSize / 2);
 
         $pdf->Image(
-            public_path('assets/images/logo-abbr.png'), // logo kecil
+            public_path('assets/images/logo-abbr.png'),
             $logoX,
             $logoY,
             $logoSize,
@@ -299,6 +308,43 @@ class CertificationController extends Controller
             'PNG'
         );
 
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica', 'BI', 9);
+        $pdf->SetXY(20, 260);
+        $pdf->Cell(165, 5, 'Authorised by', 0, 1, 'R');
+
+        $qrWebX = 170;
+        $qrWebY = 268;
+        $qrWebSize = 15;
+
+        $websiteUrl = 'https://inheren.com/';
+
+        $pdf->write2DBarcode(
+            $websiteUrl,
+            'QRCODE,H',
+            $qrWebX,
+            $qrWebY,
+            $qrWebSize,
+            $qrWebSize,
+            [],
+            'N'
+        );
+
+        $textX = $qrWebX - 70;
+        $textY = $qrWebY - 1;
+
+        $pdf->SetFont('helvetica', '', 8);
+        $pdf->SetTextColor(0,0,0);
+
+        $text = "PLAZA MUTIARA Mega Kuningan Lantai 8
+        Jl. DR. Ide Anak Agung Gde Agung Kav. E.1.2 No. 1 & 2
+        Jakarta Selatan - DKI Jakarta - Indonesia
+        www.inheren.com | info@inheren.com";
+
+        $pdf->SetXY($textX, $textY);
+        $pdf->MultiCell(65, 4, $text, 0, 'R');
+        // ================= QR CODE =================
+        
         return $pdf->Output('certificate-'.$certificateNumber.'.pdf', 'I');
     }
 }
