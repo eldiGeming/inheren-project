@@ -212,49 +212,49 @@ class CertificationController extends Controller
         // This is to certify that
         $pdf->SetTextColor(0,0,0);
         $pdf->SetFont('helvetica', 'BI', 16);
-        $pdf->SetXY(20, 85);
+        $pdf->SetXY(20, 90);
         $pdf->Cell(165, 8, 'This is to certify that', 0, 1, 'R');
 
         // COMPANY NAME (RED BIG)
-        $pdf->SetTextColor(200, 0, 0);
+        $pdf->SetTextColor(139, 0, 0);
         $pdf->SetFont('helvetica', 'B', 15);
-        $pdf->SetXY(20, 97);
+        $pdf->SetXY(20, 100);
         $pdf->MultiCell(165, 10, $companyName, 0, 'R');
 
         // ADDRESS (RED SMALL)
         $pdf->SetTextColor(0,0,0);
         $pdf->SetFont('helvetica', '', 12);
-        $pdf->SetXY(30, 105);
+        $pdf->SetXY(30, 108);
         $pdf->MultiCell(155, 5, $companyAddress, 0, 'R');
 
         // Compliance text
         $pdf->SetTextColor(0,0,0);
         $pdf->SetFont('helvetica', 'BI', 16);
-        $pdf->SetXY(20, 127);
+        $pdf->SetXY(20, 130);
         $pdf->Cell(165, 8, 'Which complies with the requirements of', 0, 1, 'R');
 
         // ISO TYPE (RED BOLD)
-        $pdf->SetTextColor(200, 0, 0);
+        $pdf->SetTextColor(139, 0, 0);
         $pdf->SetFont('helvetica', 'B', 15);
-        $pdf->SetXY(20, 138);
+        $pdf->SetXY(20, 141);
         $pdf->MultiCell(165, 8, $certificateType, 0, 'R');
 
         // DESCRIPTION (SMALL BLACK)
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetFont('helvetica', '', 12);
-        $pdf->SetXY(20, 145);
+        $pdf->SetXY(20, 148);
         $pdf->MultiCell(165, 4, $certificateDescription, 0, 'R');
 
         // Scope Title
         $pdf->SetTextColor(0,0,0);
         $pdf->SetFont('helvetica', 'BI', 16);
-        $pdf->SetXY(20, 157);
+        $pdf->SetXY(20, 160);
         $pdf->Cell(165, 4, 'For the following activities', 0, 1, 'R');
 
         // Scope Activities (RED MULTILINE)
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetFont('helvetica', '', 12);
-        $pdf->SetXY(30, 168);
+        $pdf->SetXY(30, 169);
         $pdf->MultiCell(155, 5, $scopeCertificate, 0, 'R');
 
         // ================= FOOTER AREA =================
@@ -303,7 +303,7 @@ class CertificationController extends Controller
 
     $pdf->SetTextColor(0,0,0);
     $pdf->SetFont('helvetica', '', 7);
-    $pdf->Cell(25,10,'Certificate No: '. $certificateNumber,0,2,'L');
+    $pdf->Cell(25,10, $certificateNumber,0,2,'C');
 
     // ===============================
     // DATES (KANAN BAWAH)
@@ -319,11 +319,6 @@ class CertificationController extends Controller
 
     $pdf->SetX(130);
     $pdf->Cell(55, 6, 'Originally Certified: ' . $issueDate, 0, 1, 'R');
-
-
-    $pdf->SetFont('helvetica', 'BI', 9);
-    $pdf->SetXY(20, 220);
-    $pdf->Cell(165, 5, 'Authorised by', 0, 1, 'R');
 
 
     $qrWebX = 158;
@@ -351,8 +346,7 @@ class CertificationController extends Controller
 $pdf->SetFont('helvetica', '', 8);
 $pdf->SetTextColor(0,0,0);
 
-$text = "PLAZA MUTIARA Mega Kuningan Lantai 8
-Jl. DR. Ide Anak Agung Gde Agung Kav. E.1.2 No. 1 & 2
+$text = "PLAZA MUTIARA Mega Kuningan Lantai 8, Jl. DR. Ide Anak Agung Gde Agung Kav. E.1.2 No. 1 & 2
 Jakarta Selatan - DKI Jakarta - Indonesia
 www.inheren.com | info@inheren.com";
 
@@ -361,7 +355,7 @@ $pdf->SetXY(20, 275);
 
 $pdf->MultiCell(
     170,   // lebar hampir full page
-    4,
+    3,
     $text,
     0,
     'C'    // center supaya seperti footer sertifikat
