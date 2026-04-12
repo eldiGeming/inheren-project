@@ -47,6 +47,7 @@
                             <th class="col-type">Type Certificate</th>
                             <th class="col-desc">Description Certificate</th>
                             <th class="col-scope">Scope Certificate</th>
+                            <th class="col-scope">Logo Certificate</th>
                             <th class="action-col">Action</th>
                         </tr>
                     </thead>
@@ -66,6 +67,11 @@
 
                             <td class="wrap-text col-scope">
                                 {{ $row->scope_certificate }}
+                            </td>
+                            <td class="wrap-text col-scope">
+                                @if($row->logo_certificate)
+                                    <img src="{{ Storage::url($row->logo_certificate) }}" width="50" class="img-thumbnail">
+                                @endif
                             </td>
 
                             <td class="action-col">
@@ -125,6 +131,11 @@
                                 <input type="text" name="scope_certificate" class="form-control">
                                 <span class="text-danger small error-text" id="error_scope_cetificate"></span>
                             </div>
+                            <div class="mb-6">
+                                <label class="form-label">Logo Certificate</label>
+                                <input type="file" name="logo_certificate" class="form-control" accept="image/*">
+                                <span class="text-danger small error-text" id="error_logo_certificate"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -167,6 +178,16 @@
                                 <label class="form-label">Scope Certificate</label>
                                 <input type="text" name="scope_certificate" value="{{ $row->scope_certificate }}" class="form-control">
                                 <span class="text-danger small error-text" id="error_scope_certificate_{{ $row->id_type_certificate }}"></span>
+                            </div>
+                            <div class="mb-6">
+                                <label class="form-label">Logo Certificate</label>
+                                @if($row->logo_certificate)
+                                    <div class="mb-2">
+                                    <img src="{{ Storage::url($row->logo_certificate) }}" width="100" class="img-thumbnail">
+                                    </div>
+                                @endif
+                                <input type="file" name="logo_certificate" class="form-control" accept="image/*">
+                                <span class="text-danger small error-text" id="error_logo_certificate_{{ $row->id_type_certificate }}"></span>
                             </div>
                         </div>
                     </div>
@@ -264,6 +285,9 @@ $(document).ready(function() {
                 data.type_certificate,
                 data.description_certificate,
                 data.scope_certificate,
+                data.logo_certificate 
+                    ? `<img src="/storage/${data.logo_certificate}" width="50" class="img-thumbnail">`
+                    : '',
                 actionButtons
             ]).draw(false).node();
 
@@ -321,7 +345,8 @@ $(document).ready(function() {
                     res.data.type_certificate,
                     res.data.description_certificate,
                     res.data.scope_certificate,
-                    rowData[4]
+                    res.data.logo_certificate,
+                    rowData[5]
                 ]).draw(false);
 
                 Swal.fire({

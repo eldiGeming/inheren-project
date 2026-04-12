@@ -27,12 +27,20 @@ class TypeCertificateController extends Controller
             'type_certificate' => 'required|max:255',
             'description_certificate' => 'required',
             'scope_certificate' => 'required',
+            'logo_certificate' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $typeCertificate = new TypeCertificate();
         $typeCertificate->type_certificate = $request->type_certificate;
         $typeCertificate->description_certificate = $request->description_certificate;
         $typeCertificate->scope_certificate = $request->scope_certificate;
+        
+        if ($request->hasFile('logo_certificate')) {
+            $file = $request->file('logo_certificate');
+            $filename = time().'_'.$file->getClientOriginalName();
+            $file->move(public_path('storage/type-certificate'), $filename);
+            $typeCertificate->logo_certificate = 'type-certificate/'.$filename;
+        }
         $typeCertificate->save();
 
         return response()->json([
@@ -42,6 +50,7 @@ class TypeCertificateController extends Controller
                 'type_certificate' => $typeCertificate->type_certificate,
                 'description_certificate' => $typeCertificate->description_certificate,
                 'scope_certificate' => $typeCertificate->scope_certificate,
+                'logo_certificate' => $typeCertificate->logo_certificate,
             ]
         ]);
     }
@@ -54,11 +63,19 @@ class TypeCertificateController extends Controller
             'type_certificate' => 'required|max:255',
             'description_certificate' => 'required',
             'scope_certificate' => 'required',
+            'logo_certificate' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $typeCertificate->type_certificate = $request->type_certificate;
         $typeCertificate->description_certificate = $request->description_certificate;
         $typeCertificate->scope_certificate = $request->scope_certificate;
+        if ($request->hasFile('logo_certificate')) {
+            $file = $request->file('logo_certificate');
+            $filename = time().'_'.$file->getClientOriginalName();
+            $file->move(public_path('storage/type-certificate'), $filename);
+            $typeCertificate->logo_certificate = 'type-certificate/'.$filename;
+        }
+
         $typeCertificate->save();
 
         return response()->json([
@@ -68,6 +85,7 @@ class TypeCertificateController extends Controller
                 'type_certificate' => $typeCertificate->type_certificate,
                 'description_certificate' => $typeCertificate->description_certificate,
                 'scope_certificate' => $typeCertificate->scope_certificate,
+                'logo_certificate' => $typeCertificate->logo_certificate,
             ]
         ]);
     }

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Certification extends Model
@@ -33,4 +33,25 @@ class Certification extends Model
     {
         return $this->belongsTo(TypeCertificate::class, 'id_type_certificate', 'id_type_certificate');
     }
+
+    
+    protected $appends = [
+        'issues_date_formatted',
+        'expired_date_formatted'
+    ];
+
+    public function getIssuesDateFormattedAttribute()
+    {
+        return $this->issues_date 
+            ? Carbon::parse($this->issues_date)->format('d-m-Y') 
+            : null;
+    }
+
+    public function getExpiredDateFormattedAttribute()
+    {
+        return $this->expired_date 
+            ? Carbon::parse($this->expired_date)->format('d-m-Y') 
+            : null;
+    }
+
 }

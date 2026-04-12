@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class TypeCertificate extends Model
@@ -12,6 +12,7 @@ class TypeCertificate extends Model
         'type_certificate',
         'description_certificate',
         'scope_certificate',
+        'logo_certificate',
         'is_deleted',
         'created_by',
         'created_at',

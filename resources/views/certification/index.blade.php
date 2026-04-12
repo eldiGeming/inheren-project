@@ -305,82 +305,99 @@ $(document).ready(function() {
         pageLength: 10
     });
 
-$('#createCertificationForm').submit(function(e){
-    e.preventDefault();
+    // ================= CREATE =================
+    $('#createCertificationForm').submit(function(e){
+        e.preventDefault();
 
-    let form = $(this);
-    let formData = new FormData(this);
-    form.find('.error-text').text('');
+        let form = $(this);
+        let formData = new FormData(this);
+        form.find('.error-text').text('');
 
-    $.ajax({
-        url: form.attr('action'),
-        method: form.attr('method'),
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(res){
+        $.ajax({
+            url: form.attr('action'),
+            method: form.attr('method'),
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(res){
 
-            $('#createCertificationModal').modal('hide');
-            form[0].reset();
+                $('#createCertificationModal').modal('hide');
+                form[0].reset();
 
-            let data = res.data;
+                let data = res.data;
 
-            let actionButtons = `
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
-                        data-bs-target="#certificationModal${data.id_certification}">
-                    </button>
-                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                        data-bs-target="#updateCertificationModal${data.id_certification}">
-                    </button>
-                    <button type="button" class="btn btn-sm btn-danger deleteCertificationBtn"
-                        data-url="/certification/${data.id_certification}"
-                        data-id="${data.id_certification}">
-                    </button>
-                    <a href="/certification/generate-pdf/${data.id_certification}"
-                        class="btn btn-sm btn-secondary" target="_blank">
-                    </a>
-                </div>
-            `;
+                let actionButtons = `
+                    <div class="d-flex gap-1 flex-wrap">
 
-            let rowNode = table.row.add([
-                table.rows().count() + 1,
-                data.company ? data.company.name_company : '',
-                data.type ? data.type.type_certificate : '',
-                data.number_certificate,
-                data.issues_date_formatted,
-                data.expired_date_formatted,
-                actionButtons
-            ]).draw(false).node();
+                        <button type="button"
+                            class="btn btn-sm btn-info text-white"
+                            data-bs-toggle="modal"
+                            data-bs-target="#certificationModal${data.id_certification}">
+                            <i class="feather-eye"></i>
+                        </button>
 
-            $(rowNode).attr('id', 'certificationRow' + data.id_certification);
+                        <button type="button"
+                            class="btn btn-sm btn-warning"
+                            data-bs-toggle="modal"
+                            data-bs-target="#updateCertificationModal${data.id_certification}">
+                            <i class="feather-edit"></i>
+                        </button>
 
-            Swal.fire({
-                icon: 'success',
-                title: 'Created!',
-                text: res.message,
-                timer: 1500,
-                showConfirmButton: false
-            });
-        },
-        error: function(err){
-            if(err.status === 422){
-                let errors = err.responseJSON.errors;
-                $.each(errors, function(key,val){
-                    $('#error_'+key).text(val[0]);
-                });
-            } else {
+                        <button type="button"
+                            class="btn btn-sm btn-danger deleteCertificationBtn"
+                            data-url="/certification/${data.id_certification}"
+                            data-id="${data.id_certification}">
+                            <i class="feather-trash-2"></i>
+                        </button>
+
+                        <a href="/certification/generate-pdf/${data.id_certification}"
+                            class="btn btn-sm btn-secondary"
+                            target="_blank">
+                            <i class="bi bi-file-earmark-pdf"></i>
+                        </a>
+
+                    </div>
+                `;
+
+                let rowNode = table.row.add([
+                    table.rows().count() + 1,
+                    data.company?.name_company ?? '-',
+                    data.type?.type_certificate ?? '-',
+                    data.number_certificate ?? '-',
+                    data.issues_date_formatted ?? '-',
+                    data.expired_date_formatted ?? '-',
+                    actionButtons
+                ]).draw(false).node();
+
+                $(rowNode).attr('id', 'certificationRow' + data.id_certification);
+
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: 'Server error occurred.'
+                    icon: 'success',
+                    title: 'Created!',
+                    text: res.message,
+                    timer: 1500,
+                    showConfirmButton: false
                 });
+            },
+            error: function(err){
+                if(err.status === 422){
+                    let errors = err.responseJSON.errors;
+                    $.each(errors, function(key,val){
+                        $('#error_'+key).text(val[0]);
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Server error occurred.'
+                    });
+                }
             }
-        }
+        });
     });
-});
 
 
+    // ================= UPDATE =================
     $('.updateCertificationForm').submit(function(e){
         e.preventDefault();
 
@@ -388,7 +405,7 @@ $('#createCertificationForm').submit(function(e){
         let id = form.data('id');
         let formData = new FormData(this);
         form.find('.error-text').text('');
-        console.log("data",formData);
+
         $.ajax({
             url: form.attr('action'),
             method: 'POST',
@@ -399,18 +416,19 @@ $('#createCertificationForm').submit(function(e){
 
                 $('#updateCertificationModal'+id).modal('hide');
 
-                let row = $('#certificationRow'+id);
-                let rowData = table.row(row).data();
+                let row = $('#certificationRow' + id);
 
-                table.row(row).data([
-                    rowData[0],
-                    res.data.company ? res.data.company.name_company : '',
-                    res.data.type ? res.data.type.type_certificate : '',
-                    res.data.number_certificate,
-                    res.data.issues_date_formatted,
-                    res.data.expired_date_formatted,
-                    rowData[6]
-                ]).draw(false);
+                let newData = [
+                    table.row(row).index() + 1,
+                    res.data.company?.name_company ?? '-',
+                    res.data.type?.type_certificate ?? '-',
+                    res.data.number_certificate ?? '-',
+                    res.data.issues_date_formatted ?? '-',
+                    res.data.expired_date_formatted ?? '-',
+                    table.row(row).data()[6] // keep action button
+                ];
+
+                table.row(row).data(newData).draw(false);
 
                 Swal.fire({
                     icon: 'success',
@@ -438,6 +456,7 @@ $('#createCertificationForm').submit(function(e){
     });
 
 
+    // ================= DELETE =================
     $(document).on('click', '.deleteCertificationBtn', function(){
 
         let url = $(this).data('url');
@@ -464,17 +483,17 @@ $('#createCertificationForm').submit(function(e){
 
                         table.row(row).remove().draw(false);
 
+                        // Re-number
+                        table.rows().every(function(index){
+                            this.cell(index,0).data(index+1);
+                        });
+
                         Swal.fire({
                             icon: 'success',
                             title: 'Deleted!',
                             text: res.message,
                             timer: 1500,
                             showConfirmButton: false
-                        });
-
-                        // Re-numbering kolom No
-                        table.rows().every(function(index){
-                            this.cell(index,0).data(index+1);
                         });
                     },
                     error: function(){

@@ -173,7 +173,7 @@
                                 <label class="form-label">Logo</label>
                                 @if($row->logo_company)
                                     <div class="mb-2">
-                                    <img src="{{ Storage::url($row->logo_company) }}" width="50" class="img-thumbnail">
+                                    <img src="{{ Storage::url($row->logo_company) }}" width="100" class="img-thumbnail">
                                     </div>
                                 @endif
                                 <input type="file" name="logo_company" class="form-control" accept="image/*">

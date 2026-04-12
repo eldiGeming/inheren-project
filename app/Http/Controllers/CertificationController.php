@@ -119,7 +119,6 @@ class CertificationController extends Controller
         $certification->id_type_certificate = $request->id_type_certificate;
         $certification->issues_date = $issuesDate;
         $certification->expired_date = $expiredDate;
-
         $certification->barcode_certificate = $certification->number_certificate;
 
         $certification->save();
@@ -128,7 +127,7 @@ class CertificationController extends Controller
 
         return response()->json([
             'message' => 'Certification updated successfully!',
-            'data' => $certification
+            'data' => $certification->load(['company','type'])
         ]);
     }
 
@@ -203,6 +202,7 @@ class CertificationController extends Controller
         $certificateDescription = $certification->type->description_certificate ?? '';
         $certificateNumber = $certification->number_certificate;
         $scopeCertificate = $certification->type->scope_certificate ?? '';
+        $logoCertificate = $certification->type->logo_certificate ?? '';
 
         $issueDate = Carbon::parse($certification->issues_date)->format('d F Y');
         $expiredDate = Carbon::parse($certification->expired_date)->format('d F Y');
@@ -300,6 +300,29 @@ class CertificationController extends Controller
     // CERTIFICATE NO DI BAWAH QR
     // ===============================
     $pdf->SetXY($qrX - 1, $qrY + $qrSize - 2);
+
+    // ===============================
+    // LOGO CERTIFICATE DI SAMPING QR
+    // ===============================
+
+    $certLogoWidth  = 20; // panjang horizontal
+    $certLogoHeight = 25; // tinggi
+
+    // posisi di kanan QR
+    $certLogoX = $qrX + $qrSize + 5; // jarak 5 dari QR
+    $certLogoY = $qrY + ($qrSize / 2) - ($certLogoHeight / 2); // center sejajar QR
+
+    // tampilkan logo kalau ada
+    if (!empty($logoCertificate)) {
+        $pdf->Image(
+            public_path('storage/' . $logoCertificate),
+            $certLogoX,
+            $certLogoY,
+            $certLogoWidth,
+            $certLogoHeight,
+            'PNG'
+        );
+    }
 
     $pdf->SetTextColor(0,0,0);
     $pdf->SetFont('helvetica', '', 7);
