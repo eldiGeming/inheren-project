@@ -393,7 +393,7 @@
         <div class="card-clean">
           <p><strong>Address:</strong><br> PLAZA MUTIARA Mega Kuningan Lantai 8, Jl. DR. Ide Anak Agung Gde Agung Kav. E.1.2 No. 1 & 2, Jakarta Selatan - DKI Jakarta - Indonesia</p>
           <p><strong>Email:</strong><br> info@inheren.com</p>
-          <p><strong>Phone:</strong><br> +62 812 3456 7890</p>
+          <p><strong>Phone:</strong><br> +62 819 9869 6911</p>
         </div>
       </div>
 
