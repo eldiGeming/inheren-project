@@ -5,6 +5,20 @@ use App\Http\Controllers\CompanyProfileController;
 use App\Http\Controllers\TypeCertificateController;
 use App\Http\Controllers\CertificationController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Http;
+
+Route::get('/test-wa', function () {
+    $response = Http::withHeaders([
+    'Authorization' => env('FONNTE_TOKEN')
+])->post('https://api.fonnte.com/send', [
+    'target' => '6281384282314',
+    'message' => 'Test WA'
+]);
+
+dd($response->status(), $response->body());
+
+    return $response->body();
+});
 
 Route::get('/', function () {
     return view('company-profile');
@@ -30,6 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/certification/{id}', [CertificationController::class, 'update'])->name('certification.update');
     Route::delete('/certification/{id}', [CertificationController::class, 'destroy'])->name('certification.destroy');
     Route::get('/certification/pdf/{id}', [CertificationController::class, 'generatePdf'])->name('certification.generatePdf');
+    Route::get('/certification/pdf-draft/{id}', [CertificationController::class, 'generatePdfDraft'])->name('certification.generatePdfDraft');
 
     Route::get('/profile', [CompanyProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [CompanyProfileController::class, 'update'])->name('profile.update');

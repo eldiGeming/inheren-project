@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('issues_date');
             $table->date('expired_date');
             $table->text('barcode_certificate');
+            $table->dateTime('reminder_sent_at')->nullable();
             $table->boolean('is_deleted')->default(false);
             $table->unsignedInteger('created_by')->nullable();
             $table->unsignedInteger('updated_by')->nullable();

@@ -385,4 +385,145 @@ $pdf->MultiCell(
 );
         return $pdf->Output('certificate-'.$certificateNumber.'.pdf', 'I');
     }
+
+
+    public function generatePdfDraft($id)
+    {
+        $certification = Certification::with(['company', 'type'])
+            ->findOrFail($id);
+
+        $pdf = new Fpdi();
+
+        // ================= PAGE SETTING =================
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->SetMargins(0, 0, 0);
+        $pdf->SetAutoPageBreak(false, 0);
+        $pdf->AddPage('P', 'A4');
+
+        // ================= LOAD TEMPLATE =================
+        $pdf->setSourceFile(public_path('templates/certificate-template.pdf'));
+        $tplIdx = $pdf->importPage(1);
+        $pdf->useTemplate($tplIdx, 0, 0, 210, 297);
+        // ================= WATERMARK DRAFT =================
+        $pdf->SetAlpha(1.5);
+
+        $pdf->SetFont('helvetica', 'B', 110);
+        $pdf->SetTextColor(235, 235, 235);
+
+        $pdf->StartTransform();
+
+        // Putar 45 derajat terhadap titik tengah halaman A4
+        $pdf->Rotate(45, 120, 148);
+
+        // Geser agar tepat di tengah
+        $pdf->Text(5, 120, 'D R A F T');
+
+        $pdf->StopTransform();
+
+        $pdf->SetAlpha(1);
+        $pdf->SetTextColor(0, 0, 0);
+
+        // ================= DATA =================
+        $companyName   = strtoupper($certification->company->name_company);
+        $companyAddress = $certification->company->address_company ?? '';
+        $certificateType = strtoupper($certification->type->type_certificate);
+        $certificateDescription = $certification->type->description_certificate ?? '';
+        $certificateNumber = $certification->number_certificate;
+        $scopeCertificate = $certification->type->scope_certificate ?? '';
+        $logoCertificate = $certification->type->logo_certificate ?? '';
+
+        $issueDate = Carbon::parse($certification->issues_date)->format('d F Y');
+        $expiredDate = Carbon::parse($certification->expired_date)->format('d F Y');
+
+        // ================= CONTENT START =================
+
+        // This is to certify that
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica', 'BI', 16);
+        $pdf->SetXY(20, 90);
+        $pdf->Cell(165, 8, 'This is to certify that', 0, 1, 'R');
+
+        // COMPANY NAME (RED BIG)
+        $pdf->SetTextColor(139, 0, 0);
+        $pdf->SetFont('helvetica', 'B', 15);
+        $pdf->SetXY(20, 100);
+        $pdf->MultiCell(165, 10, $companyName, 0, 'R');
+
+        // ADDRESS (RED SMALL)
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica', '', 12);
+        $pdf->SetXY(30, 108);
+        $pdf->MultiCell(155, 5, $companyAddress, 0, 'R');
+
+        // Compliance text
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica', 'BI', 16);
+        $pdf->SetXY(20, 130);
+        $pdf->Cell(165, 8, 'Which complies with the requirements of', 0, 1, 'R');
+
+        // ISO TYPE (RED BOLD)
+        $pdf->SetTextColor(139, 0, 0);
+        $pdf->SetFont('helvetica', 'B', 15);
+        $pdf->SetXY(20, 141);
+        $pdf->MultiCell(165, 8, $certificateType, 0, 'R');
+
+        // DESCRIPTION (SMALL BLACK)
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('helvetica', '', 12);
+        $pdf->SetXY(20, 148);
+        $pdf->MultiCell(165, 4, $certificateDescription, 0, 'R');
+
+        // Scope Title
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica', 'BI', 16);
+        $pdf->SetXY(20, 160);
+        $pdf->Cell(165, 4, 'For the following activities', 0, 1, 'R');
+
+        // Scope Activities (RED MULTILINE)
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('helvetica', '', 12);
+        $pdf->SetXY(30, 169);
+        $pdf->MultiCell(155, 5, $scopeCertificate, 0, 'R');
+
+        // ================= FOOTER AREA =================
+
+        $pdf->SetFont('helvetica', '', 9);
+        $pdf->SetTextColor(0,0,0);
+
+    // ===============================
+    // DATES (KANAN BAWAH)
+    // ===============================
+    $pdf->SetTextColor(0,0,0);
+    $pdf->SetFont('helvetica','',9);
+
+    $pdf->SetXY(130, 195);
+    $pdf->Cell(55, 6, 'Issued: ' . $issueDate, 0, 2, 'R');
+
+    $pdf->SetX(130);
+    $pdf->Cell(55, 6, 'Expires: ' . $expiredDate, 0, 1, 'R');
+
+    $pdf->SetX(130);
+    $pdf->Cell(55, 6, 'Originally Certified: ' . $issueDate, 0, 1, 'R');
+
+
+    $pdf->SetFont('helvetica', '', 8);
+    $pdf->SetTextColor(0,0,0);
+
+    $text = "PLAZA MUTIARA Mega Kuningan Lantai 8, Jl. DR. Ide Anak Agung Gde Agung Kav. E.1.2 No. 1 & 2
+    Jakarta Selatan - DKI Jakarta - Indonesia
+    www.inheren.com | info@inheren.com";
+
+    // posisi bawah halaman
+    $pdf->SetXY(20, 275);
+
+    $pdf->MultiCell(
+        170,   // lebar hampir full page
+        3,
+        $text,
+        0,
+        'C'    // center supaya seperti footer sertifikat
+    );
+        return $pdf->Output('certificate-'.$certificateNumber.'.pdf', 'I');
+    }
 }

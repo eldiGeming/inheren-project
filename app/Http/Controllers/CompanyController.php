@@ -9,18 +9,16 @@ class CompanyController extends Controller
     public function index()
     {
         $allCompany = Company::where('is_deleted', 0)->get();
+        // dd($allCompany);    
         return view('company.index', compact('allCompany'));
+
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'name_company' => 'required|max:255',
-            'description_company' => 'required',
-            'phone_company' => 'required',
-            'email_company' => 'required|email',
             'address_company' => 'required',
-            'logo_company' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $company = new Company();
@@ -57,11 +55,7 @@ class CompanyController extends Controller
 
         $request->validate([
             'name_company' => 'required|max:255',
-            'description_company' => 'required',
-            'phone_company' => 'required',
-            'email_company' => 'required|email',
             'address_company' => 'required',
-            'logo_company' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $company->name_company = $request->name_company;

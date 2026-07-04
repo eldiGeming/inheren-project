@@ -53,7 +53,7 @@
                     </thead>
                     <tbody>
                         @foreach($allTypeCertificate as $key => $row)
-                        <tr id="typeCertificateRow{{ $row->id_type_certificate }}">
+                        <tr id="{{ $row->id_type_certificate }}">
                             
                             <td class="col-no">{{ $key + 1 }}</td>
 
@@ -231,7 +231,7 @@
 
 @push('scripts')
 <script>
-$(document).ready(function() {
+$(function () {
 
     $.ajaxSetup({
         headers: {
@@ -239,191 +239,191 @@ $(document).ready(function() {
         }
     });
 
-    let table = $('#typeCertificateList').DataTable({
+    $('#typeCertificateList').DataTable({
         pageLength: 10
     });
 
-    $('#createTypeCertificateForm').submit(function(e){
-    e.preventDefault();
+    // ==========================
+    // CREATE
+    // ==========================
+    $('#createTypeCertificateForm').on('submit', function (e) {
 
-    let form = $(this);
-    let formData = new FormData(this);
-    form.find('.error-text').text('');
-
-    $.ajax({
-        url: form.attr('action'),
-        method: form.attr('method'),
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(res){
-
-            $('#createTypeCertificateModal').modal('hide');
-            form[0].reset();
-
-            let data = res.data;
-
-            let actionButtons = `
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-sm btn-warning"
-                        data-bs-toggle="modal"
-                        data-bs-target="#updateTypeCertificateModal${data.id}">
-                        <i class="feather-edit me-1"></i>
-                    </button>
-
-                    <button type="button"
-                        class="btn btn-sm btn-danger deleteTypeCertificateBtn"
-                        data-url="/type-certificate/${data.id}"
-                        data-id="${data.id}">
-                        <i class="feather-trash-2 me-1"></i>
-                    </button>
-                </div>
-            `;
-
-            let rowNode = table.row.add([
-                table.rows().count() + 1,
-                data.type_certificate,
-                data.description_certificate,
-                data.scope_certificate,
-                data.logo_certificate 
-                    ? `<img src="/storage/${data.logo_certificate}" width="50" class="img-thumbnail">`
-                    : '',
-                actionButtons
-            ]).draw(false).node();
-
-            $(rowNode).attr('id', 'typeCertificateRow' + data.id);
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Created!',
-                text: res.message,
-                timer: 1500,
-                showConfirmButton: false
-            });
-        },
-        error: function(err){
-            if(err.status === 422){
-                let errors = err.responseJSON.errors;
-                $.each(errors, function(key,val){
-                    $('#error_'+key).text(val[0]);
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: 'Server error occurred.'
-                });
-            }
-        }
-    });
-});
-
-    $('.updateTypeCertificateForm').submit(function(e){
         e.preventDefault();
 
         let form = $(this);
-        let id = form.data('id');
         let formData = new FormData(this);
+
         form.find('.error-text').text('');
 
         $.ajax({
             url: form.attr('action'),
-            method: 'POST',
+            type: 'POST',
             data: formData,
             processData: false,
             contentType: false,
-            success: function(res){
 
-                $('#updateTypeCertificateModal'+id).modal('hide');
+            success: function (res) {
 
-                let row = $('#typeCertificateRow'+id);
-                let rowData = table.row(row).data();
-
-                // Update kolom langsung
-                table.row(row).data([
-                    rowData[0],
-                    res.data.type_certificate,
-                    res.data.description_certificate,
-                    res.data.scope_certificate,
-                    res.data.logo_certificate,
-                    rowData[5]
-                ]).draw(false);
+                $('#createTypeCertificateModal').modal('hide');
+                form[0].reset();
 
                 Swal.fire({
                     icon: 'success',
-                    title: 'Updated!',
+                    title: 'Success',
                     text: res.message,
-                    timer: 1500,
+                    timer: 1200,
                     showConfirmButton: false
+                }).then(() => {
+                    location.reload();
                 });
+
             },
-            error: function(err){
-                if(err.status === 422){
-                    let errors = err.responseJSON.errors;
-                    $.each(errors, function(key,val){
-                        $('#error_'+key+'_'+id).text(val[0]);
+
+            error: function (err) {
+
+                if (err.status === 422) {
+
+                    $.each(err.responseJSON.errors, function (key, value) {
+                        $('#error_' + key).text(value[0]);
                     });
+
                 } else {
+
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error!',
+                        title: 'Error',
                         text: 'Server error occurred.'
                     });
+
                 }
+
             }
+
         });
+
     });
 
 
-    $(document).on('click', '.deleteTypeCertificateBtn', function(){
+    // ==========================
+    // UPDATE
+    // ==========================
+    $('.updateTypeCertificateForm').on('submit', function (e) {
+        e.preventDefault();
+
+        let form = $(this);
+        let id = form.data('id');
+
+        let formData = new FormData(this);
+
+        form.find('.error-text').text('');
+
+        $.ajax({
+
+            url: form.attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+
+            success: function (res) {
+
+                $('#updateTypeCertificateModal' + id).modal('hide');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: res.message,
+                    timer: 1200,
+                    showConfirmButton: false
+                }).then(() => {
+                    location.reload();
+                });
+
+            },
+
+            error: function (err) {
+
+                if (err.status === 422) {
+
+                    $.each(err.responseJSON.errors, function (key, value) {
+
+                        $('#error_' + key + '_' + id).text(value[0]);
+
+                    });
+
+                } else {
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Server error occurred.'
+                    });
+
+                }
+
+            }
+
+        });
+
+    });
+
+
+    // ==========================
+    // DELETE
+    // ==========================
+    $(document).on('click', '.deleteTypeCertificateBtn', function () {
 
         let url = $(this).data('url');
-        let id = $(this).data('id');
-        let row = $('#typeCertificateRow' + id);
 
         Swal.fire({
+
             title: 'Are you sure?',
-            text: "This data will be deleted.!",
+            text: 'This data will be deleted!',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#6c757d',
             confirmButtonText: 'Yes, delete it!'
+
         }).then((result) => {
 
-            if(result.isConfirmed){
+            if (!result.isConfirmed) return;
 
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: { _method: 'DELETE' },
-                    success: function(res){
+            $.ajax({
 
-                        table.row(row).remove().draw(false);
+                url: url,
+                type: 'POST',
+                data: {
+                    _method: 'DELETE'
+                },
 
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Deleted!',
-                            text: res.message,
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
+                success: function (res) {
 
-                        // Re-numbering kolom No
-                        table.rows().every(function(index){
-                            this.cell(index,0).data(index+1);
-                        });
-                    },
-                    error: function(){
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: 'Server error occurred.'
-                        });
-                    }
-                });
-            }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: res.message,
+                        timer: 1200,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
+
+                },
+
+                error: function () {
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Server error occurred.'
+                    });
+
+                }
+
+            });
+
         });
+
     });
 
 });

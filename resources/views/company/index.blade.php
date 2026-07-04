@@ -13,6 +13,7 @@
 
         <div class="card-body p-0">
             <div class="table-responsive">
+
                 <table class="table table-hover" id="companyList">
                     <thead>
                         <tr>
@@ -20,28 +21,22 @@
                             <th>Company Name</th>
                             <th>Company Phone</th>
                             <th>Company Email</th>
-                            <th>Company Logo</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($allCompany as $key => $row)
-                        <tr id="companyRow{{ $row->id_company }}">
+                        <tr id="{{ $row->id_company }}">
                             <td>{{ $key + 1 }}</td>
                             <td>{{ $row->name_company }}</td>
                             <td>{{ $row->phone_company }}</td>
                             <td>{{ $row->email_company }}</td>
                             <td>
-                                @if($row->logo_company)
-                                    <img src="{{ Storage::url($row->logo_company) }}" width="50" class="img-thumbnail">
-                                @endif
-                            </td>
-                            <td>
                                 <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
+                                    {{-- <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
                                         data-bs-target="#companyModal{{ $row->id_company }}">
                                         <i class="feather-eye me-1"></i>
-                                    </button>
+                                    </button> --}}
                                     <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
                                         data-bs-target="#updateCompanyModal{{ $row->id_company }}">
                                         <i class="feather-edit me-1"></i>
@@ -79,14 +74,14 @@
                         {{-- Left Column --}}
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Company Name</label>
+                                <label class="form-label">Company Name<span class="text-danger">*</span></label>
                                 <input type="text" name="name_company" class="form-control">
                                 <span class="text-danger small error-text" id="error_name_company"></span>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Description</label>
-                                <input type="text" name="description_company" class="form-control">
-                                <span class="text-danger small error-text" id="error_description_company"></span>
+                                <label class="form-label">Address<span class="text-danger">*</span></label>
+                                <input type="text" name="address_company" class="form-control">
+                                <span class="text-danger small error-text" id="error_address_company"></span>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Phone</label>
@@ -103,9 +98,9 @@
                                 <span class="text-danger small error-text" id="error_email_company"></span>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Address</label>
-                                <input type="text" name="address_company" class="form-control">
-                                <span class="text-danger small error-text" id="error_address_company"></span>
+                                <label class="form-label">Description</label>
+                                <input type="text" name="description_company" class="form-control">
+                                <span class="text-danger small error-text" id="error_description_company"></span>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Logo</label>
@@ -141,12 +136,12 @@
                         {{-- Left Column --}}
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Company Name</label>
+                                <label class="form-label">Company Name<span class="text-danger">*</span></label>
                                 <input type="text" name="name_company" value="{{ $row->name_company }}" class="form-control">
                                 <span class="text-danger small error-text" id="error_name_company_{{ $row->id_company }}"></span>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Description</label>
+                                <label class="form-label">Description<span class="text-danger">*</span></label>
                                 <input type="text" name="description_company" value="{{ $row->description_company }}" class="form-control">
                                 <span class="text-danger small error-text" id="error_description_company_{{ $row->id_company }}"></span>
                             </div>
@@ -241,7 +236,7 @@
 
 @push('scripts')
 <script>
-$(document).ready(function() {
+$(function () {
 
     $.ajaxSetup({
         headers: {
@@ -249,196 +244,192 @@ $(document).ready(function() {
         }
     });
 
-    let table = $('#companyList').DataTable({
+    $('#companyList').DataTable({
         pageLength: 10
     });
 
-    $('#createCompanyForm').submit(function(e){
+    // ==========================
+    // CREATE
+    // ==========================
+    $('#createCompanyForm').on('submit', function (e) {
+
         e.preventDefault();
+
         let form = $(this);
         let formData = new FormData(this);
+
         form.find('.error-text').text('');
 
         $.ajax({
             url: form.attr('action'),
-            method: form.attr('method'),
+            type: 'POST',
             data: formData,
             processData: false,
             contentType: false,
-            success: function(res){
+
+            success: function (res) {
 
                 $('#createCompanyModal').modal('hide');
                 form[0].reset();
 
-                let data = res.data;
-
-                let actionButtons = `
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
-                        data-bs-target="#companyModal${data.id_company}">
-                        <i class="feather-eye me-1"></i>
-                    </button>
-
-                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                        data-bs-target="#updateCompanyModal${data.id_company}">
-                        <i class="feather-edit me-1"></i>
-                    </button>
-
-                    <button 
-                        type="button"
-                        class="btn btn-sm btn-danger deleteCompanyBtn"
-                        data-url="/company/${data.id_company}"
-                        data-id="${data.id_company}">
-                        <i class="feather-trash-2 me-1"></i>
-                    </button>                                   
-                </div>
-                `;
-
-                let rowNode = table.row.add([
-                    table.rows().count() + 1,
-                    data.name_company,
-                    data.phone_company,
-                    data.email_company,
-                    data.logo_company 
-                        ? `<img src="/storage/${data.logo_company}" width="50" class="img-thumbnail">`
-                        : '',
-                    actionButtons
-                ]).draw(false).node();
-
-                $(rowNode).attr('id', 'companyRow' + data.id_company);
-
                 Swal.fire({
                     icon: 'success',
-                    title: 'Created!',
+                    title: 'Success',
                     text: res.message,
-                    timer: 1500,
+                    timer: 1200,
                     showConfirmButton: false
+                }).then(() => {
+                    location.reload();
                 });
+
             },
-            error: function(err){
-                if(err.status === 422){
-                    let errors = err.responseJSON.errors;
-                    $.each(errors, function(key,val){
-                        $('#error_'+key).text(val[0]);
+
+            error: function (err) {
+
+                if (err.status === 422) {
+
+                    $.each(err.responseJSON.errors, function (key, value) {
+                        $('#error_' + key).text(value[0]);
                     });
+
                 } else {
+
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error!',
+                        title: 'Error',
                         text: 'Server error occurred.'
                     });
+
                 }
+
             }
+
         });
+
     });
 
 
-    $('.updateCompanyForm').submit(function(e){
+    // ==========================
+    // UPDATE
+    // ==========================
+    $('.updateCompanyForm').on('submit', function (e) {
+
         e.preventDefault();
 
         let form = $(this);
-        let id = form.data('id');
+        let id = form.data('id');   
+
         let formData = new FormData(this);
+
         form.find('.error-text').text('');
 
         $.ajax({
+
             url: form.attr('action'),
-            method: 'POST',
+            type: 'POST',
             data: formData,
             processData: false,
             contentType: false,
-            success: function(res){
-                console.log("data", res.data);
-                $('#updateCompanyModal'+id).modal('hide');
 
-                let row = $('#companyRow'+id);
-                let rowData = table.row(row).data();
+            success: function (res) {
 
-                table.row(row).data([
-                    rowData[0],
-                    res.data.name_company,
-                    res.data.phone_company,
-                    res.data.email_company,
-                    res.data.logo_company ? `<img src="/storage/${res.data.logo_company}" width="50" class="img-thumbnail">`
-                        : '',
-                    rowData[5]
-                ]).draw(false);
-
+                $('#updateCompanyModal' + id).modal('hide');
                 Swal.fire({
                     icon: 'success',
-                    title: 'Updated!',
+                    title: 'Success',
                     text: res.message,
-                    timer: 1500,
+                    timer: 1200,
                     showConfirmButton: false
+                }).then(() => {
+                    location.reload();
                 });
+
             },
-            error: function(err){
-                if(err.status === 422){
-                    let errors = err.responseJSON.errors;
-                    $.each(errors, function(key,val){
-                        $('#error_'+key+'_'+id).text(val[0]);
+
+            error: function (err) {
+
+                if (err.status === 422) {
+
+                    $.each(err.responseJSON.errors, function (key, value) {
+
+                        $('#error_' + key + '_' + id).text(value[0]);
+
                     });
+
                 } else {
+
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error!',
+                        title: 'Error',
                         text: 'Server error occurred.'
                     });
+
                 }
+
             }
+
         });
+
     });
 
 
-    $(document).on('click', '.deleteCompanyBtn', function(){
+    // ==========================
+    // DELETE
+    // ==========================
+    $(document).on('click', '.deleteCompanyBtn', function () {
 
         let url = $(this).data('url');
-        let id = $(this).data('id');
-        let row = $('#companyRow' + id);
 
         Swal.fire({
+
             title: 'Are you sure?',
-            text: "This data will be deleted!",
+            text: 'This data will be deleted!',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#6c757d',
             confirmButtonText: 'Yes, delete it!'
+
         }).then((result) => {
 
-            if(result.isConfirmed){
+            if (!result.isConfirmed) return;
 
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: { _method: 'DELETE' },
-                    success: function(res){
+            $.ajax({
 
-                        table.row(row).remove().draw(false);
+                url: url,
+                type: 'POST',
+                data: {
+                    _method: 'DELETE'
+                },
 
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Deleted!',
-                            text: res.message,
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
+                success: function (res) {
 
-                        // Re-numbering kolom No
-                        table.rows().every(function(index){
-                            this.cell(index,0).data(index+1);
-                        });
-                    },
-                    error: function(){
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: 'Server error occurred.'
-                        });
-                    }
-                });
-            }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: res.message,
+                        timer: 1200,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
+
+                },
+
+                error: function () {
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Server error occurred.'
+                    });
+
+                }
+
+            });
+
         });
+
     });
 
 });

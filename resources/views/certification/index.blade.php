@@ -47,34 +47,47 @@
                     <td class="text-center">{{ $row->expired_date_formatted }}</td>
 
                     <td>
-                        <div class="d-flex gap-1 flex-wrap">
+                        <div class="d-flex align-items-center gap-1 flex-nowrap">
 
                             <button type="button"
                                 class="btn btn-sm btn-info text-white"
                                 data-bs-toggle="modal"
-                                data-bs-target="#certificationModal{{ $row->id_certification }}">
+                                data-bs-target="#certificationModal{{ $row->id_certification }}"
+                                title="Lihat">
                                 <i class="feather-eye"></i>
                             </button>
 
                             <button type="button"
                                 class="btn btn-sm btn-warning"
                                 data-bs-toggle="modal"
-                                data-bs-target="#updateCertificationModal{{ $row->id_certification }}">
+                                data-bs-target="#updateCertificationModal{{ $row->id_certification }}"
+                                title="Edit">
                                 <i class="feather-edit"></i>
                             </button>
 
-                            <button 
+                            <button
                                 type="button"
                                 class="btn btn-sm btn-danger deleteCertificationBtn"
                                 data-url="{{ route('certification.destroy', $row->id_certification) }}"
-                                data-id="{{ $row->id_certification }}">
+                                data-id="{{ $row->id_certification }}"
+                                title="Hapus">
                                 <i class="feather-trash-2"></i>
                             </button>
 
+                            <!-- PDF Final -->
                             <a href="{{ route('certification.generatePdf', $row->id_certification) }}"
-                               class="btn btn-sm btn-secondary"
-                               target="_blank">
-                                <i class="bi bi-file-earmark-pdf"></i>
+                                class="btn btn-sm btn-danger"
+                                target="_blank"
+                                title="Generate PDF Final">
+                                <i class="bi bi-file-earmark-pdf-fill"></i>
+                            </a>
+
+                            <!-- PDF Draft -->
+                            <a href="{{ route('certification.generatePdfDraft', $row->id_certification) }}"
+                                class="btn btn-sm btn-warning"
+                                target="_blank"
+                                title="Generate PDF Draft">
+                                <i class="bi bi-pencil-square"></i>
                             </a>
 
                         </div>
