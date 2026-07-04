@@ -406,7 +406,7 @@ $pdf->MultiCell(
         $tplIdx = $pdf->importPage(1);
         $pdf->useTemplate($tplIdx, 0, 0, 210, 297);
         // ================= WATERMARK DRAFT =================
-        $pdf->SetAlpha(1.5);
+        $pdf->SetAlpha(3);
 
         $pdf->SetFont('helvetica', 'B', 110);
         $pdf->SetTextColor(235, 235, 235);
@@ -491,6 +491,48 @@ $pdf->MultiCell(
         $pdf->SetFont('helvetica', '', 9);
         $pdf->SetTextColor(0,0,0);
 
+        // ===============================
+        // QR VERIFY DI KIRI BAWAH
+        // ===============================
+
+        $qrX = 40;
+        $qrY = 228;
+        $qrSize = 25;
+
+        // LOGO DI TENGAH QR
+        $logoSize = 8;
+        $logoX = $qrX + ($qrSize / 2) - ($logoSize / 2);
+        $logoY = $qrY + ($qrSize / 2) - ($logoSize / 2);
+
+        // ===============================
+        // CERTIFICATE NO DI BAWAH QR
+        // ===============================
+        $pdf->SetXY($qrX - 1, $qrY + $qrSize - 2);
+            // ===============================
+        // LOGO CERTIFICATE DI SAMPING QR
+        // ===============================
+
+        $certLogoWidth  = 20; // panjang horizontal
+        $certLogoHeight = 25; // tinggi
+
+        // posisi di kanan QR
+        $certLogoX = $qrX + $qrSize + 5; // jarak 5 dari QR
+        $certLogoY = $qrY + ($qrSize / 2) - ($certLogoHeight / 2); // center sejajar QR
+
+        // tampilkan logo kalau ada
+        if (!empty($logoCertificate)) {
+            $pdf->Image(
+                public_path('storage/' . $logoCertificate),
+                $certLogoX,
+                $certLogoY,
+                $certLogoWidth,
+                $certLogoHeight,
+                'PNG'
+            );
+        }
+
+    $pdf->SetTextColor(0,0,0);
+    $pdf->SetFont('helvetica', '', 7);
     // ===============================
     // DATES (KANAN BAWAH)
     // ===============================
@@ -505,7 +547,6 @@ $pdf->MultiCell(
 
     $pdf->SetX(130);
     $pdf->Cell(55, 6, 'Originally Certified: ' . $issueDate, 0, 1, 'R');
-
 
     $pdf->SetFont('helvetica', '', 8);
     $pdf->SetTextColor(0,0,0);
