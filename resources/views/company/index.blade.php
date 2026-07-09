@@ -32,10 +32,10 @@
                             <td>{{ $row->email_company }}</td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    {{-- <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
+                                    <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
                                         data-bs-target="#companyModal{{ $row->id_company }}">
                                         <i class="feather-eye me-1"></i>
-                                    </button> --}}
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
                                         data-bs-target="#updateCompanyModal{{ $row->id_company }}">
                                         <i class="feather-edit me-1"></i>
@@ -199,29 +199,31 @@
             <div class="modal-body">
                 <div class="row mb-3">
                     <div class="col-md-4 fw-bold">Name</div>
-                    <div class="col-md-8">{{ $row->name_company }}</div>
+                    <div class="col-md-8">{{ $row->name_company ?? '-' }}</div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-4 fw-bold">Description</div>
-                    <div class="col-md-8">{{ $row->description_company }}</div>
+                    <div class="col-md-8">{{ $row->description_company ?? '-' }}</div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-4 fw-bold">Phone</div>
-                    <div class="col-md-8">{{ $row->phone_company }}</div>
+                    <div class="col-md-8">{{ $row->phone_company ?? '-' }}</div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-4 fw-bold">Email</div>
-                    <div class="col-md-8">{{ $row->email_company }}</div>
+                    <div class="col-md-8">{{ $row->email_company ?? '-' }}</div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-4 fw-bold">Address</div>
-                    <div class="col-md-8">{{ $row->address_company }}</div>
+                    <div class="col-md-8">{{ $row->address_company ?? '-' }}</div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-4 fw-bold">Logo</div>
                     <div class="col-md-8">
-                        @if($row->logo_company)
+                        @if(filled($row->logo_company))
                             <img src="{{ Storage::url($row->logo_company) }}" width="50" class="img-thumbnail">
+                        @else
+                            -
                         @endif
                     </div>
                 </div>
