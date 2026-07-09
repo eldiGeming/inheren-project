@@ -3,6 +3,9 @@
 @section('title', 'Company')
 
 @section('content')
+@php
+    use Illuminate\Support\Str;
+@endphp
 <div class="main-content">
     <div class="card stretch stretch-full">
         <div class="d-flex justify-content-end p-3">
@@ -19,7 +22,7 @@
                             <th>No</th>
                             <th>Company Name</th>
                             <th>Company Phone</th>
-                            <th>Company Email</th>
+                            <th>Company Address</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -29,7 +32,7 @@
                             <td>{{ $key + 1 }}</td>
                             <td>{{ $row->name_company }}</td>
                             <td>{{ $row->phone_company }}</td>
-                            <td>{{ $row->email_company }}</td>
+                            <td>{{ Str::limit($row->address_company, 40, '...') }}</td>
                             <td>
                                 <div class="d-flex gap-2">
                                     <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
