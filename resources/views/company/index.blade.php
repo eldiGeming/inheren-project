@@ -13,7 +13,6 @@
 
         <div class="card-body p-0">
             <div class="table-responsive">
-
                 <table class="table table-hover" id="companyList">
                     <thead>
                         <tr>
@@ -141,9 +140,9 @@
                                 <span class="text-danger small error-text" id="error_name_company_{{ $row->id_company }}"></span>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Description<span class="text-danger">*</span></label>
-                                <input type="text" name="description_company" value="{{ $row->description_company }}" class="form-control">
-                                <span class="text-danger small error-text" id="error_description_company_{{ $row->id_company }}"></span>
+                                <label class="form-label">Address<span class="text-danger">*</span></label>
+                                <input type="text" name="address_company" value="{{ $row->address_company }}" class="form-control">
+                                <span class="text-danger small error-text" id="error_address_company_{{ $row->id_company }}"></span>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Phone</label>
@@ -160,10 +159,11 @@
                                 <span class="text-danger small error-text" id="error_email_company_{{ $row->id_company }}"></span>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Address</label>
-                                <input type="text" name="address_company" value="{{ $row->address_company }}" class="form-control">
-                                <span class="text-danger small error-text" id="error_address_company_{{ $row->id_company }}"></span>
+                                <label class="form-label">Description</label>
+                                <input type="text" name="description_company" value="{{ $row->description_company }}" class="form-control">
+                                <span class="text-danger small error-text" id="error_description_company_{{ $row->id_company }}"></span>
                             </div>
+                            
                             <div class="mb-3">
                                 <label class="form-label">Logo</label>
                                 @if($row->logo_company)
