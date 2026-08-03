@@ -233,20 +233,32 @@
 <!-- HERO -->
 <section id="hero" class="hero">
   <div class="container">
-    <div class="row align-items-center">
+    <div class="row justify-content-center align-items-center">
 
-      <div class="col-lg-6">
+      <div class="col-lg-8 text-center">
         <h1>Trusted ISO Certification Partner for Your Business</h1>
-        <p>
-          Helping organizations achieve international standards through professional,
-          efficient, and globally recognized certification services.
-        </p>
-        <a href="#contact" class="btn btn-hero">Get Free Consultation</a>
-      </div>
 
-      <div class="col-lg-6 text-center">
-        <img src="{{ asset('assets/images/hero-img.jpg') }}" class="img-fluid hero-img">
+        <p class="mt-3 mb-4">
+          Helping organizations achieve international standards through
+          professional, efficient, and globally recognized certification
+          services.
+        </p>
+
+        <div class="d-flex justify-content-center gap-3">
+          <a href="#contact" class="btn btn-hero px-4">
+            Get Free Consultation
+          </a>
+
+          <a
+            href="https://wa.me/6281998696911"
+            target="_blank"
+            class="btn btn-hero text-center px-4"
+            style="background-color:#25D366; color:#fff; border-color:#25D366;"
+          >
+            <i class="bi bi-whatsapp"></i> WhatsApp
+          </a>
         </div>
+      </div>
 
     </div>
   </div>
@@ -261,52 +273,43 @@
       <p>A Trusted Partner in ISO Certification</p>
     </div>
 
-    <div class="row align-items-center">
+    <div class="row justify-content-center">
 
-      <!-- TEXT -->
-      <div class="col-lg-6">
+      <div class="col-lg-8 text-center">
 
         <h3 class="mb-3">Building Trust Through International Standards</h3>
 
         <p>
-          Inheren Certification is a professional certification body committed to helping organizations 
-          achieve internationally recognized ISO standards. We deliver structured, transparent, and 
+          Inheren Certification is a professional certification body committed to helping organizations
+          achieve internationally recognized ISO standards. We deliver structured, transparent, and
           efficient certification processes designed to strengthen credibility and business performance.
         </p>
 
         <p>
-          With a team of experienced auditors and industry experts, we ensure every certification is 
+          With a team of experienced auditors and industry experts, we ensure every certification is
           conducted with integrity, accuracy, and global compliance.
         </p>
 
-        <!-- HIGHLIGHT POINT -->
-        <div class="row mt-4">
+        <div class="row mt-4 justify-content-center">
 
-          <div class="col-6 mb-2">
+          <div class="col-md-5 col-6 mb-3">
             <p><i class="bi bi-check-circle-fill text-primary"></i> Certified Auditors</p>
           </div>
 
-          <div class="col-6 mb-2">
+          <div class="col-md-5 col-6 mb-3">
             <p><i class="bi bi-check-circle-fill text-primary"></i> Transparent Process</p>
           </div>
 
-          <div class="col-6 mb-2">
+          <div class="col-md-5 col-6 mb-3">
             <p><i class="bi bi-check-circle-fill text-primary"></i> Global Standards</p>
           </div>
 
-          <div class="col-6 mb-2">
+          <div class="col-md-5 col-6 mb-3">
             <p><i class="bi bi-check-circle-fill text-primary"></i> Fast Certification</p>
           </div>
 
         </div>
 
-      </div>
-
-      <!-- IMAGE (PAKAI PUNYA KAMU) -->
-      <div class="col-lg-6 text-center">
-        <img src="{{ asset('assets/images/about.jpg') }}" 
-             class="img-fluid hero-img" 
-             alt="About Inheren Certification">
       </div>
 
     </div>
@@ -413,7 +416,7 @@
 
 <!-- FOOTER -->
 <footer class="text-center">
-  <p>© 2026 Inheren Certification. All Rights Reserved.</p>
+  <p>© 2020 Inheren Certification. All Rights Reserved.</p>
 </footer>
 
 </body>

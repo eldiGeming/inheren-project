@@ -25,7 +25,7 @@
                         <span class="nxl-micon">
                             <i class="bi bi-clipboard2-check-fill"></i>
                         </span>
-                        <span class="nxl-mtext">Certificate Type</span>
+                        <span class="nxl-mtext">Standard</span>
                     </a>
                 </li>
 

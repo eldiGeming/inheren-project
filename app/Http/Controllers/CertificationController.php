@@ -345,7 +345,7 @@ class CertificationController extends Controller
 
 
     $qrWebX = 158;
-    $qrWebY = 230;
+    $qrWebY = 228;
     $qrWebSize = 25;
     $signatureUrl = asset('storage/sign/sign_director.png');
 

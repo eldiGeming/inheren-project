@@ -44,10 +44,10 @@
                     <thead>
                         <tr>
                             <th class="col-no">No</th>
-                            <th class="col-type">Type Certificate</th>
-                            <th class="col-desc">Description Certificate</th>
-                            <th class="col-scope">Scope Certificate</th>
-                            <th class="col-scope">Logo Certificate</th>
+                            <th class="col-type">Standard</th>
+                            <th class="col-desc">Description Standard</th>
+                            <th class="col-scope">Scope Standard</th>
+                            <th class="col-scope">Logo Standard</th>
                             <th class="action-col">Action</th>
                         </tr>
                     </thead>
@@ -109,7 +109,7 @@
             <form id="createTypeCertificateForm" action="{{ route('type-certificate.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">Create Type Certificate</h5>
+                    <h5 class="modal-title">Create Standard</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -117,22 +117,22 @@
                         {{-- Left Column --}}
                         <div class="col-md-12">
                             <div class="mb-6">
-                                <label class="form-label">Type Certificate</label>
+                                <label class="form-label">Standard</label>
                                 <input type="text" name="type_certificate" class="form-control">
                                 <span class="text-danger small error-text" id="error_type_certificate"></span>
                             </div>
                             <div class="mb-6">
-                                <label class="form-label">Description Certificate</label>
+                                <label class="form-label">Description Standard</label>
                                 <input type="text" name="description_certificate" class="form-control">
                                 <span class="text-danger small error-text" id="error_description_cetificate"></span>
                             </div>
                             <div class="mb-6">
-                                <label class="form-label">Scope Certificate</label>
+                                <label class="form-label">Scope Standard</label>
                                 <input type="text" name="scope_certificate" class="form-control">
                                 <span class="text-danger small error-text" id="error_scope_cetificate"></span>
                             </div>
                             <div class="mb-6">
-                                <label class="form-label">Logo Certificate</label>
+                                <label class="form-label">Logo Standard</label>
                                 <input type="file" name="logo_certificate" class="form-control" accept="image/*">
                                 <span class="text-danger small error-text" id="error_logo_certificate"></span>
                             </div>
@@ -157,7 +157,7 @@
                 @csrf
                 @method('PATCH')
                 <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title">Edit Type Certification</h5>
+                    <h5 class="modal-title">Edit Standard</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -165,22 +165,22 @@
                         {{-- Left Column --}}
                         <div class="col-md-12">
                             <div class="mb-6">
-                                <label class="form-label">Type Certificate</label>
+                                <label class="form-label">Standard</label>
                                 <input type="text" name="type_certificate" value="{{ $row->type_certificate }}" class="form-control">
                                 <span class="text-danger small error-text" id="error_type_certificate_{{ $row->id_type_certificate }}"></span>
                             </div>
                             <div class="mb-6">
-                                <label class="form-label">Description Certificate</label>
+                                <label class="form-label">Description Standard</label>
                                 <input type="text" name="description_certificate" value="{{ $row->description_certificate }}" class="form-control">
                                 <span class="text-danger small error-text" id="error_description_certificate_{{ $row->id_type_certificate }}"></span>
                             </div>
                             <div class="mb-6">
-                                <label class="form-label">Scope Certificate</label>
+                                <label class="form-label">Scope Standard</label>
                                 <input type="text" name="scope_certificate" value="{{ $row->scope_certificate }}" class="form-control">
                                 <span class="text-danger small error-text" id="error_scope_certificate_{{ $row->id_type_certificate }}"></span>
                             </div>
                             <div class="mb-6">
-                                <label class="form-label">Logo Certificate</label>
+                                <label class="form-label">Logo Standard</label>
                                 @if($row->logo_certificate)
                                     <div class="mb-2">
                                     <img src="{{ Storage::url($row->logo_certificate) }}" width="100" class="img-thumbnail">
