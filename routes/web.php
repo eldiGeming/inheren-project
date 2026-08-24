@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/certification/{id}', [CertificationController::class, 'destroy'])->name('certification.destroy');
     Route::get('/certification/pdf/{id}', [CertificationController::class, 'generatePdf'])->name('certification.generatePdf');
     Route::get('/certification/pdf-draft/{id}', [CertificationController::class, 'generatePdfDraft'])->name('certification.generatePdfDraft');
+    Route::get('/certification/image/{id}', [CertificationController::class, 'generateCertificateImage'])->name('certification.generateCertificateImage');
 
     Route::get('/profile', [CompanyProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [CompanyProfileController::class, 'update'])->name('profile.update');

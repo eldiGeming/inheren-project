@@ -89,7 +89,6 @@
                                 title="Generate PDF Draft">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
-
                         </div>
                     </td>
 

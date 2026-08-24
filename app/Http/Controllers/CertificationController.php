@@ -215,22 +215,49 @@ class CertificationController extends Controller
         $pdf->SetXY(20, 90);
         $pdf->Cell(165, 8, 'This is to certify that', 0, 1, 'R');
 
-        // COMPANY NAME (RED BIG)
+        // COMPANY NAME
         $pdf->SetTextColor(139, 0, 0);
         $pdf->SetFont('helvetica', 'B', 15);
-        $pdf->SetXY(20, 100);
-        $pdf->MultiCell(165, 10, $companyName, 0, 'R');
+        $pdf->SetXY(30, 100);
 
-        // ADDRESS (RED SMALL)
-        $pdf->SetTextColor(0,0,0);
+        $pdf->MultiCell(
+            155,
+            7,
+            $companyName,
+            0,
+            'R'
+        );
+
+        // Ambil posisi Y setelah company name
+        $companyNameBottom = $pdf->GetY();
+
+        // ADDRESS
+        $pdf->SetTextColor(0, 0, 0);
         $pdf->SetFont('helvetica', '', 12);
-        $pdf->SetXY(30, 108);
-        $pdf->MultiCell(155, 5, $companyAddress, 0, 'R');
+        $pdf->SetXY(30, $companyNameBottom + 2);
+
+        $pdf->MultiCell(
+            155,
+            5,
+            $companyAddress,
+            0,
+            'R'
+        );
+
+        // SCOPE
+        $pdf->SetXY(30, 169);
+        $pdf->MultiCell(
+            155,
+            5,
+            $scopeCertificate,
+            0,
+            'R'
+        );
 
         // Compliance text
         $pdf->SetTextColor(0,0,0);
         $pdf->SetFont('helvetica', 'BI', 16);
-        $pdf->SetXY(20, 130);
+        $pdf->SetXY(20, 133);
         $pdf->Cell(165, 8, 'Which complies with the requirements of', 0, 1, 'R');
 
         // ISO TYPE (RED BOLD)
@@ -260,129 +287,138 @@ class CertificationController extends Controller
         // ================= FOOTER AREA =================
 
         $pdf->SetFont('helvetica', '', 9);
-    $pdf->SetTextColor(0,0,0);
+        $pdf->SetTextColor(0,0,0);
 
-    // ===============================
-    // QR VERIFY DI KIRI BAWAH
-    // ===============================
-    $verifyUrl = route('certification.verify', $certificateNumber);
+        // ===============================
+        // QR VERIFY DI KIRI BAWAH
+        // ===============================
+        $verifyUrl = route('certification.verify', $certificateNumber);
 
-    $qrX = 40;
-    $qrY = 228;
-    $qrSize = 25;
+        $qrX = 40;
+        $qrY = 228;
+        $qrSize = 25;
 
-    $pdf->write2DBarcode(
-        $verifyUrl,
-        'QRCODE,H',
-        $qrX,
-        $qrY,
-        $qrSize,
-        $qrSize,
-        [],
-        'N'
-    );
+        $pdf->write2DBarcode(
+            $verifyUrl,
+            'QRCODE,H',
+            $qrX,
+            $qrY,
+            $qrSize,
+            $qrSize,
+            [],
+            'N'
+        );
 
-    // LOGO DI TENGAH QR
-    $logoSize = 8;
-    $logoX = $qrX + ($qrSize / 2) - ($logoSize / 2);
-    $logoY = $qrY + ($qrSize / 2) - ($logoSize / 2);
+        // LOGO DI TENGAH QR
+        $logoSize = 8;
+        $logoX = $qrX + ($qrSize / 2) - ($logoSize / 2);
+        $logoY = $qrY + ($qrSize / 2) - ($logoSize / 2);
 
-    $pdf->Image(
-        public_path('assets/images/logo-abbr.png'),
-        $logoX,
-        $logoY,
-        $logoSize,
-        $logoSize,
-        'PNG'
-    );
-
-    // ===============================
-    // CERTIFICATE NO DI BAWAH QR
-    // ===============================
-    $pdf->SetXY($qrX - 1, $qrY + $qrSize - 2);
-
-    // ===============================
-    // LOGO CERTIFICATE DI SAMPING QR
-    // ===============================
-
-    $certLogoWidth  = 20; // panjang horizontal
-    $certLogoHeight = 25; // tinggi
-
-    // posisi di kanan QR
-    $certLogoX = $qrX + $qrSize + 5; // jarak 5 dari QR
-    $certLogoY = $qrY + ($qrSize / 2) - ($certLogoHeight / 2); // center sejajar QR
-
-    // tampilkan logo kalau ada
-    if (!empty($logoCertificate)) {
         $pdf->Image(
-            public_path('storage/' . $logoCertificate),
-            $certLogoX,
-            $certLogoY,
-            $certLogoWidth,
-            $certLogoHeight,
+            public_path('assets/images/logo-abbr.png'),
+            $logoX,
+            $logoY,
+            $logoSize,
+            $logoSize,
             'PNG'
         );
-    }
 
-    $pdf->SetTextColor(0,0,0);
-    $pdf->SetFont('helvetica', '', 7);
-    $pdf->Cell(25,10, $certificateNumber,0,2,'C');
+        // ===============================
+        // CERTIFICATE NO DI BAWAH QR
+        // ===============================
+        $pdf->SetXY($qrX - 1, $qrY + $qrSize - 2);
 
-    // ===============================
-    // DATES (KANAN BAWAH)
-    // ===============================
-    $pdf->SetTextColor(0,0,0);
-    $pdf->SetFont('helvetica','',9);
+        // ===============================
+        // LOGO CERTIFICATE DI SAMPING QR
+        // ===============================
 
-    $pdf->SetXY(130, 195);
-    $pdf->Cell(55, 6, 'Issued: ' . $issueDate, 0, 2, 'R');
+        $certLogoWidth  = 20; // panjang horizontal
+        $certLogoHeight = 25; // tinggi
 
-    $pdf->SetX(130);
-    $pdf->Cell(55, 6, 'Expires: ' . $expiredDate, 0, 1, 'R');
+        // posisi di kanan QR
+        $certLogoX = $qrX + $qrSize + 5; // jarak 5 dari QR
+        $certLogoY = $qrY + ($qrSize / 2) - ($certLogoHeight / 2); // center sejajar QR
 
-    $pdf->SetX(130);
-    $pdf->Cell(55, 6, 'Originally Certified: ' . $issueDate, 0, 1, 'R');
+        // tampilkan logo kalau ada
+        if (!empty($logoCertificate)) {
+            $pdf->Image(
+                public_path('storage/' . $logoCertificate),
+                $certLogoX,
+                $certLogoY,
+                $certLogoWidth,
+                $certLogoHeight,
+                'PNG'
+            );
+        }
+
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica', '', 7);
+        $pdf->Cell(25,10, $certificateNumber,0,2,'C');
+
+        // ===============================
+        // DATES (KANAN BAWAH)
+        // ===============================
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica','',9);
+
+        $pdf->SetXY(130, 195);
+        $pdf->Cell(55, 6, 'Issued: ' . $issueDate, 0, 2, 'R');
+
+        $pdf->SetX(130);
+        $pdf->Cell(55, 6, 'Expires: ' . $expiredDate, 0, 1, 'R');
+
+        $pdf->SetX(130);
+        $pdf->Cell(55, 6, 'Originally Certified: ' . $issueDate, 0, 1, 'R');
 
 
-    $qrWebX = 158;
-    $qrWebY = 228;
-    $qrWebSize = 25;
-    $signatureUrl = asset('storage/sign/sign_director.png');
+        $qrWebX = 158;
+        $qrWebY = 228;
+        $qrWebSize = 25;
+        $signatureUrl = asset('storage/sign/sign_director.png');
 
-    $pdf->write2DBarcode(
-        $signatureUrl,
-        'QRCODE,H',
-        $qrWebX,
-        $qrWebY,
-        $qrWebSize,
-        $qrWebSize,
-        [],
-        'N'
-    );
+        $pdf->write2DBarcode(
+            $signatureUrl,
+            'QRCODE,H',
+            $qrWebX,
+            $qrWebY,
+            $qrWebSize,
+            $qrWebSize,
+            [],
+            'N'
+        );
 
-    // GARIS DAN DIRECTOR
-    $pdf->SetFont('helvetica','',9);
-    $pdf->SetX(120);
-    $pdf->Cell(58,5,'Director',0,1,'R');
+        // GARIS DAN DIRECTOR
+        $pdf->SetFont('helvetica','',9);
+        $pdf->SetX(120);
+        $pdf->Cell(58,5,'Director',0,1,'R');
 
 
-$pdf->SetFont('helvetica', '', 8);
-$pdf->SetTextColor(0,0,0);
+        $pdf->SetTextColor(0, 0, 0);
 
-$text = "PLAZA MUTIARA Mega Kuningan Lantai 8, Jl. DR. Ide Anak Agung Gde Agung Kav. E.1.2 No. 1 & 2
-Jakarta Selatan - DKI Jakarta - Indonesia
-www.inheren.com | info@inheren.com";
+        // PT. Inheren Sertifikasi
+        $pdf->SetFont('helvetica', 'B', 10);
+        $pdf->SetXY(20, 270);
+        $pdf->Cell(
+            170,
+            4,
+            'PT. Inheren Sertifikasi',
+            0,
+            1,
+            'C'
+        );
 
-// posisi bawah halaman
-$pdf->SetXY(20, 275);
-
-$pdf->MultiCell(
-    170,   // lebar hampir full page
-    3,
-    $text,
-    0,
-    'C'    // center supaya seperti footer sertifikat
-);
+        // Alamat dan informasi
+        $pdf->SetFont('helvetica', '', 8);
+        $pdf->SetXY(20, $pdf->GetY());
+        $pdf->MultiCell(
+            170,
+            3,
+            "PLAZA MUTIARA Mega Kuningan Lantai 8, Jl. DR. Ide Anak Agung Gde Agung Kav. E.1.2 No. 1 & 2\n" .
+            "Jakarta Selatan - DKI Jakarta - Indonesia\n" .
+            "www.inheren.com | info@inheren.com",
+            0,
+            'C'
+        );
         return $pdf->Output('certificate-'.$certificateNumber.'.pdf', 'I');
     }
 
@@ -445,21 +481,39 @@ $pdf->MultiCell(
         $pdf->Cell(165, 8, 'This is to certify that', 0, 1, 'R');
 
         // COMPANY NAME (RED BIG)
+        // COMPANY NAME
         $pdf->SetTextColor(139, 0, 0);
         $pdf->SetFont('helvetica', 'B', 15);
-        $pdf->SetXY(20, 100);
-        $pdf->MultiCell(165, 10, $companyName, 0, 'R');
+        $pdf->SetXY(30, 100);
 
-        // ADDRESS (RED SMALL)
-        $pdf->SetTextColor(0,0,0);
+        $pdf->MultiCell(
+            155,
+            7,
+            $companyName,
+            0,
+            'R'
+        );
+
+        // Ambil posisi Y setelah company name
+        $companyNameBottom = $pdf->GetY();
+
+        // ADDRESS
+        $pdf->SetTextColor(0, 0, 0);
         $pdf->SetFont('helvetica', '', 12);
-        $pdf->SetXY(30, 108);
-        $pdf->MultiCell(155, 5, $companyAddress, 0, 'R');
+        $pdf->SetXY(30, $companyNameBottom + 2);
+
+        $pdf->MultiCell(
+            155,
+            5,
+            $companyAddress,
+            0,
+            'R'
+        );
 
         // Compliance text
         $pdf->SetTextColor(0,0,0);
         $pdf->SetFont('helvetica', 'BI', 16);
-        $pdf->SetXY(20, 130);
+        $pdf->SetXY(20, 133);
         $pdf->Cell(165, 8, 'Which complies with the requirements of', 0, 1, 'R');
 
         // ISO TYPE (RED BOLD)
@@ -531,40 +585,321 @@ $pdf->MultiCell(
             );
         }
 
-    $pdf->SetTextColor(0,0,0);
-    $pdf->SetFont('helvetica', '', 7);
-    // ===============================
-    // DATES (KANAN BAWAH)
-    // ===============================
-    $pdf->SetTextColor(0,0,0);
-    $pdf->SetFont('helvetica','',9);
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica', '', 7);
+        // ===============================
+        // DATES (KANAN BAWAH)
+        // ===============================
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica','',9);
 
-    $pdf->SetXY(130, 195);
-    $pdf->Cell(55, 6, 'Issued: ' . $issueDate, 0, 2, 'R');
+        $pdf->SetXY(130, 195);
+        $pdf->Cell(55, 6, 'Issued: ' . $issueDate, 0, 2, 'R');
 
-    $pdf->SetX(130);
-    $pdf->Cell(55, 6, 'Expires: ' . $expiredDate, 0, 1, 'R');
+        $pdf->SetX(130);
+        $pdf->Cell(55, 6, 'Expires: ' . $expiredDate, 0, 1, 'R');
 
-    $pdf->SetX(130);
-    $pdf->Cell(55, 6, 'Originally Certified: ' . $issueDate, 0, 1, 'R');
+        $pdf->SetX(130);
+        $pdf->Cell(55, 6, 'Originally Certified: ' . $issueDate, 0, 1, 'R');
 
-    $pdf->SetFont('helvetica', '', 8);
-    $pdf->SetTextColor(0,0,0);
+        $pdf->SetTextColor(0, 0, 0);
 
-    $text = "PLAZA MUTIARA Mega Kuningan Lantai 8, Jl. DR. Ide Anak Agung Gde Agung Kav. E.1.2 No. 1 & 2
-    Jakarta Selatan - DKI Jakarta - Indonesia
-    www.inheren.com | info@inheren.com";
+        // PT. Inheren Sertifikasi
+        $pdf->SetFont('helvetica', 'B', 10);
+        $pdf->SetXY(20, 270);
+        $pdf->Cell(
+            170,
+            4,
+            'PT. Inheren Sertifikasi',
+            0,
+            1,
+            'C'
+        );
 
-    // posisi bawah halaman
-    $pdf->SetXY(20, 275);
-
-    $pdf->MultiCell(
-        170,   // lebar hampir full page
-        3,
-        $text,
-        0,
-        'C'    // center supaya seperti footer sertifikat
-    );
+        // Alamat dan informasi
+        $pdf->SetFont('helvetica', '', 8);
+        $pdf->SetXY(20, $pdf->GetY());
+        $pdf->MultiCell(
+            170,
+            3,
+            "PLAZA MUTIARA Mega Kuningan Lantai 8, Jl. DR. Ide Anak Agung Gde Agung Kav. E.1.2 No. 1 & 2\n" .
+            "Jakarta Selatan - DKI Jakarta - Indonesia\n" .
+            "www.inheren.com | info@inheren.com",
+            0,
+            'C'
+        );
         return $pdf->Output('certificate-'.$certificateNumber.'.pdf', 'I');
+    }
+
+    public function generatePdfContent($id)
+    {
+        $certification = Certification::with(['company', 'type'])
+            ->findOrFail($id);
+
+        $pdf = new Fpdi();
+
+        // ================= PAGE SETTING =================
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->SetMargins(0, 0, 0);
+        $pdf->SetAutoPageBreak(false, 0);
+        $pdf->AddPage('P', 'A4');
+
+        // ================= LOAD TEMPLATE =================
+        $pdf->setSourceFile(public_path('templates/certificate-template.pdf'));
+        $tplIdx = $pdf->importPage(1);
+        $pdf->useTemplate($tplIdx, 0, 0, 210, 297);
+
+        // ================= DATA =================
+        $companyName   = strtoupper($certification->company->name_company);
+        $companyAddress = $certification->company->address_company ?? '';
+        $certificateType = strtoupper($certification->type->type_certificate);
+        $certificateDescription = $certification->type->description_certificate ?? '';
+        $certificateNumber = $certification->number_certificate;
+        $scopeCertificate = $certification->type->scope_certificate ?? '';
+        $logoCertificate = $certification->type->logo_certificate ?? '';
+
+        $issueDate = Carbon::parse($certification->issues_date)->format('d F Y');
+        $expiredDate = Carbon::parse($certification->expired_date)->format('d F Y');
+
+        // ================= CONTENT START =================
+
+        // This is to certify that
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica', 'BI', 16);
+        $pdf->SetXY(20, 90);
+        $pdf->Cell(165, 8, 'This is to certify that', 0, 1, 'R');
+
+        // COMPANY NAME
+        $pdf->SetTextColor(139, 0, 0);
+        $pdf->SetFont('helvetica', 'B', 15);
+        $pdf->SetXY(30, 100);
+
+        $pdf->MultiCell(
+            155,
+            7,
+            $companyName,
+            0,
+            'R'
+        );
+
+        // Ambil posisi Y setelah company name
+        $companyNameBottom = $pdf->GetY();
+
+        // ADDRESS
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('helvetica', '', 12);
+        $pdf->SetXY(30, $companyNameBottom + 2);
+
+        $pdf->MultiCell(
+            155,
+            5,
+            $companyAddress,
+            0,
+            'R'
+        );
+
+        // SCOPE
+        $pdf->SetXY(30, 169);
+        $pdf->MultiCell(
+            155,
+            5,
+            $scopeCertificate,
+            0,
+            'R'
+        );
+
+        // Compliance text
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica', 'BI', 16);
+        $pdf->SetXY(20, 133);
+        $pdf->Cell(165, 8, 'Which complies with the requirements of', 0, 1, 'R');
+
+        // ISO TYPE (RED BOLD)
+        $pdf->SetTextColor(139, 0, 0);
+        $pdf->SetFont('helvetica', 'B', 15);
+        $pdf->SetXY(20, 141);
+        $pdf->MultiCell(165, 8, $certificateType, 0, 'R');
+
+        // DESCRIPTION (SMALL BLACK)
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('helvetica', '', 12);
+        $pdf->SetXY(20, 148);
+        $pdf->MultiCell(165, 4, $certificateDescription, 0, 'R');
+
+        // Scope Title
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica', 'BI', 16);
+        $pdf->SetXY(20, 160);
+        $pdf->Cell(165, 4, 'For the following activities', 0, 1, 'R');
+
+        // Scope Activities (RED MULTILINE)
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('helvetica', '', 12);
+        $pdf->SetXY(30, 169);
+        $pdf->MultiCell(155, 5, $scopeCertificate, 0, 'R');
+
+        // ================= FOOTER AREA =================
+
+        $pdf->SetFont('helvetica', '', 9);
+        $pdf->SetTextColor(0,0,0);
+
+        // ===============================
+        // QR VERIFY DI KIRI BAWAH
+        // ===============================
+        $verifyUrl = route('certification.verify', $certificateNumber);
+
+        $qrX = 40;
+        $qrY = 228;
+        $qrSize = 25;
+
+        $pdf->write2DBarcode(
+            $verifyUrl,
+            'QRCODE,H',
+            $qrX,
+            $qrY,
+            $qrSize,
+            $qrSize,
+            [],
+            'N'
+        );
+
+        // LOGO DI TENGAH QR
+        $logoSize = 8;
+        $logoX = $qrX + ($qrSize / 2) - ($logoSize / 2);
+        $logoY = $qrY + ($qrSize / 2) - ($logoSize / 2);
+
+        $pdf->Image(
+            public_path('assets/images/logo-abbr.png'),
+            $logoX,
+            $logoY,
+            $logoSize,
+            $logoSize,
+            'PNG'
+        );
+
+        // ===============================
+        // CERTIFICATE NO DI BAWAH QR
+        // ===============================
+        $pdf->SetXY($qrX - 1, $qrY + $qrSize - 2);
+
+        // ===============================
+        // LOGO CERTIFICATE DI SAMPING QR
+        // ===============================
+
+        $certLogoWidth  = 20; // panjang horizontal
+        $certLogoHeight = 25; // tinggi
+
+        // posisi di kanan QR
+        $certLogoX = $qrX + $qrSize + 5; // jarak 5 dari QR
+        $certLogoY = $qrY + ($qrSize / 2) - ($certLogoHeight / 2); // center sejajar QR
+
+        // tampilkan logo kalau ada
+        if (!empty($logoCertificate)) {
+            $pdf->Image(
+                public_path('storage/' . $logoCertificate),
+                $certLogoX,
+                $certLogoY,
+                $certLogoWidth,
+                $certLogoHeight,
+                'PNG'
+            );
+        }
+
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica', '', 7);
+        $pdf->Cell(25,10, $certificateNumber,0,2,'C');
+
+        // ===============================
+        // DATES (KANAN BAWAH)
+        // ===============================
+        $pdf->SetTextColor(0,0,0);
+        $pdf->SetFont('helvetica','',9);
+
+        $pdf->SetXY(130, 195);
+        $pdf->Cell(55, 6, 'Issued: ' . $issueDate, 0, 2, 'R');
+
+        $pdf->SetX(130);
+        $pdf->Cell(55, 6, 'Expires: ' . $expiredDate, 0, 1, 'R');
+
+        $pdf->SetX(130);
+        $pdf->Cell(55, 6, 'Originally Certified: ' . $issueDate, 0, 1, 'R');
+
+
+        $qrWebX = 158;
+        $qrWebY = 228;
+        $qrWebSize = 25;
+        $signatureUrl = asset('storage/sign/sign_director.png');
+
+        $pdf->write2DBarcode(
+            $signatureUrl,
+            'QRCODE,H',
+            $qrWebX,
+            $qrWebY,
+            $qrWebSize,
+            $qrWebSize,
+            [],
+            'N'
+        );
+
+        // GARIS DAN DIRECTOR
+        $pdf->SetFont('helvetica','',9);
+        $pdf->SetX(120);
+        $pdf->Cell(58,5,'Director',0,1,'R');
+
+
+        $pdf->SetTextColor(0, 0, 0);
+
+        // PT. Inheren Sertifikasi
+        $pdf->SetFont('helvetica', 'B', 10);
+        $pdf->SetXY(20, 270);
+        $pdf->Cell(
+            170,
+            4,
+            'PT. Inheren Sertifikasi',
+            0,
+            1,
+            'C'
+        );
+
+        // Alamat dan informasi
+        $pdf->SetFont('helvetica', '', 8);
+        $pdf->SetXY(20, $pdf->GetY());
+        $pdf->MultiCell(
+            170,
+            3,
+            "PLAZA MUTIARA Mega Kuningan Lantai 8, Jl. DR. Ide Anak Agung Gde Agung Kav. E.1.2 No. 1 & 2\n" .
+            "Jakarta Selatan - DKI Jakarta - Indonesia\n" .
+            "www.inheren.com | info@inheren.com",
+            0,
+            'C'
+        );
+        return $pdf;
+    }
+
+    public function generateCertificateImage($id)
+    {
+        $pdf = $this->generatePdfContent($id);
+
+        $pdfContent = $pdf->Output(
+            'certificate.pdf',
+            'S'
+        );
+
+        $imagick = new \Imagick();
+
+        $imagick->setResolution(150, 150);
+        $imagick->readImageBlob($pdfContent);
+
+        $imagick->setIteratorIndex(0);
+        $imagick->setImageFormat('png');
+
+        $image = $imagick->getImageBlob();
+
+        $imagick->clear();
+        $imagick->destroy();
+
+        return response($image)
+            ->header('Content-Type', 'image/png');
     }
 }
