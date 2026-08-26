@@ -211,13 +211,13 @@ class CertificationController extends Controller
 
         // This is to certify that
         $pdf->SetTextColor(0,0,0);
-        $pdf->SetFont('helvetica', 'BI', 16);
+        $pdf->SetFont('helvetica', 'BI', 14);
         $pdf->SetXY(20, 90);
         $pdf->Cell(165, 8, 'This is to certify that', 0, 1, 'R');
 
         // COMPANY NAME
         $pdf->SetTextColor(139, 0, 0);
-        $pdf->SetFont('helvetica', 'B', 15);
+        $pdf->SetFont('helvetica', 'B', 16);
         $pdf->SetXY(30, 100);
 
         $pdf->MultiCell(
@@ -256,13 +256,13 @@ class CertificationController extends Controller
 
         // Compliance text
         $pdf->SetTextColor(0,0,0);
-        $pdf->SetFont('helvetica', 'BI', 16);
+        $pdf->SetFont('helvetica', 'BI', 14);
         $pdf->SetXY(20, 133);
         $pdf->Cell(165, 8, 'Which complies with the requirements of', 0, 1, 'R');
 
         // ISO TYPE (RED BOLD)
         $pdf->SetTextColor(139, 0, 0);
-        $pdf->SetFont('helvetica', 'B', 15);
+        $pdf->SetFont('helvetica', 'B', 16);
         $pdf->SetXY(20, 141);
         $pdf->MultiCell(165, 8, $certificateType, 0, 'R');
 
@@ -274,7 +274,7 @@ class CertificationController extends Controller
 
         // Scope Title
         $pdf->SetTextColor(0,0,0);
-        $pdf->SetFont('helvetica', 'BI', 16);
+        $pdf->SetFont('helvetica', 'BI', 14);
         $pdf->SetXY(20, 160);
         $pdf->Cell(165, 4, 'For the following activities', 0, 1, 'R');
 
@@ -395,13 +395,13 @@ class CertificationController extends Controller
 
         $pdf->SetTextColor(0, 0, 0);
 
-        // PT. Inheren Sertifikasi
+        // PT. Inheren Sertifikasi Indonesia
         $pdf->SetFont('helvetica', 'B', 10);
         $pdf->SetXY(20, 270);
         $pdf->Cell(
             170,
             4,
-            'PT. Inheren Sertifikasi',
+            'PT. Inheren Sertifikasi Indonesia',
             0,
             1,
             'C'
@@ -476,14 +476,14 @@ class CertificationController extends Controller
 
         // This is to certify that
         $pdf->SetTextColor(0,0,0);
-        $pdf->SetFont('helvetica', 'BI', 16);
+        $pdf->SetFont('helvetica', 'BI', 14);
         $pdf->SetXY(20, 90);
         $pdf->Cell(165, 8, 'This is to certify that', 0, 1, 'R');
 
         // COMPANY NAME (RED BIG)
         // COMPANY NAME
         $pdf->SetTextColor(139, 0, 0);
-        $pdf->SetFont('helvetica', 'B', 15);
+        $pdf->SetFont('helvetica', 'B', 16);
         $pdf->SetXY(30, 100);
 
         $pdf->MultiCell(
@@ -512,13 +512,13 @@ class CertificationController extends Controller
 
         // Compliance text
         $pdf->SetTextColor(0,0,0);
-        $pdf->SetFont('helvetica', 'BI', 16);
+        $pdf->SetFont('helvetica', 'BI', 14);
         $pdf->SetXY(20, 133);
         $pdf->Cell(165, 8, 'Which complies with the requirements of', 0, 1, 'R');
 
         // ISO TYPE (RED BOLD)
         $pdf->SetTextColor(139, 0, 0);
-        $pdf->SetFont('helvetica', 'B', 15);
+        $pdf->SetFont('helvetica', 'B', 16);
         $pdf->SetXY(20, 141);
         $pdf->MultiCell(165, 8, $certificateType, 0, 'R');
 
@@ -530,7 +530,7 @@ class CertificationController extends Controller
 
         // Scope Title
         $pdf->SetTextColor(0,0,0);
-        $pdf->SetFont('helvetica', 'BI', 16);
+        $pdf->SetFont('helvetica', 'BI', 14);
         $pdf->SetXY(20, 160);
         $pdf->Cell(165, 4, 'For the following activities', 0, 1, 'R');
 
@@ -604,13 +604,13 @@ class CertificationController extends Controller
 
         $pdf->SetTextColor(0, 0, 0);
 
-        // PT. Inheren Sertifikasi
+        // PT. Inheren Sertifikasi Indonesia
         $pdf->SetFont('helvetica', 'B', 10);
         $pdf->SetXY(20, 270);
         $pdf->Cell(
             170,
             4,
-            'PT. Inheren Sertifikasi',
+            'PT. Inheren Sertifikasi Indonesia',
             0,
             1,
             'C'
@@ -850,13 +850,13 @@ class CertificationController extends Controller
 
         $pdf->SetTextColor(0, 0, 0);
 
-        // PT. Inheren Sertifikasi
+        // PT. Inheren Sertifikasi Indonesia
         $pdf->SetFont('helvetica', 'B', 10);
         $pdf->SetXY(20, 270);
         $pdf->Cell(
             170,
             4,
-            'PT. Inheren Sertifikasi',
+            'PT. Inheren Sertifikasi Indonesia',
             0,
             1,
             'C'

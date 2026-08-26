@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #fafafa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             position: relative;
             min-height: 100vh;
@@ -29,7 +29,7 @@
             transform: translate(-50%, -50%);
             width: 60%;
             max-width: 520px;
-            opacity: 0.08;
+            opacity: 0.06;
             pointer-events: none;
             z-index: 0;
             user-select: none;
@@ -53,68 +53,168 @@
         }
 
         /* ===== Status icon (verified / locked) ===== */
+        .certificate-logo {
+            width: 130px;   /* sesuaikan dengan ukuran icon lama */
+            height: 130px;
+            object-fit: contain;
+        }
+
         .status-icon-wrapper {
             position: relative;
-            width: 90px;
-            height: 90px;
-            margin: 0 auto 1rem auto;
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 1.5rem auto;
         }
 
         .status-icon-wrapper .main-icon {
-            width: 90px;
-            height: 90px;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.75rem;
+            font-size: 4rem;
+            position: relative;
         }
 
-        .status-icon-wrapper.active .main-icon {
-            background-color: #d1e7dd;
-            color: #0f5132;
-        }
-
-        .status-icon-wrapper.expired .main-icon {
-            background-color: #f8d7da;
-            color: #842029;
-        }
-
-        /* Lock badge overlay, only shown when expired */
-        .status-icon-wrapper .lock-overlay {
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background-color: #842029;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            border: 3px solid #fff;
-        }
 
         .status-badge {
-            font-weight: bold;
-            font-size: 1rem;
-            padding: 0.5rem 0;
+            font-weight: 700;
+            font-size: 1.05rem;
+            letter-spacing: 0.06em;
+            padding: 0.75rem 1.75rem;
             border-radius: 8px;
-            display: block;
-            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
             text-align: center;
+            width: 100%;
+        }
+
+        .status-badge i {
+            font-size: 1rem;
         }
 
         .status-active {
             background-color: #d1e7dd;
             color: #0f5132;
+            box-shadow: 0 2px 8px rgba(15, 81, 50, 0.15);
         }
 
         .status-expired {
             background-color: #f8d7da;
             color: #842029;
+            box-shadow: 0 2px 8px rgba(132, 32, 41, 0.15);
+        }
+
+                .company-info {
+            background: #ffffff;
+            border: 1px solid #dcdfe3;
+            border-radius: 4px;
+            padding: 1.5rem 1.75rem;
+            margin: 0 auto 1.75rem auto;
+            max-width: 480px;
+            text-align: left;
+        }
+
+        .company-info .company-name {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.85rem;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .company-info .company-name .icon-badge {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+            border: 1px solid #1b2a47;
+            border-radius: 2px;
+            color: #1b2a47;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            margin-top: 0.1rem;
+        }
+
+        .company-info .company-name .text-block {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .company-info .company-name .label-eyebrow {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #6c757d;
+            margin-bottom: 0.3rem;
+        }
+
+        .company-info .company-name .company-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1b2a47;
+            line-height: 1.35;
+        }
+
+        .company-info .company-address {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.85rem;
+        }
+
+        .company-info .company-address .icon-badge {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+            border: 1px solid #adb5bd;
+            border-radius: 2px;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .company-info .company-address .text-block {
+            display: flex;
+            flex-direction: column;
+            padding-top: 0.05rem;
+        }
+
+        .company-info .company-address .label-eyebrow {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #6c757d;
+            margin-bottom: 0.3rem;
+        }
+
+        .company-info .company-address .address-text {
+            color: #495057;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 480px) {
+            .company-info {
+                padding: 1.25rem 1.35rem;
+                max-width: 100%;
+            }
+
+            .company-info .company-name .company-title {
+                font-size: 1rem;
+            }
+
+            .company-info .company-address .address-text {
+                font-size: 0.85rem;
+            }
         }
 
         h3 {
@@ -151,14 +251,20 @@
             }
 
             .status-icon-wrapper {
-                width: 76px;
-                height: 76px;
+                width: 100px;
+                height: 100px;
             }
 
             .status-icon-wrapper .main-icon {
-                width: 76px;
-                height: 76px;
-                font-size: 2.25rem;
+                width: 100px;
+                height: 100px;
+                font-size: 3rem;
+            }
+
+            .status-icon-wrapper .lock-overlay {
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
             }
         }
 
@@ -198,23 +304,25 @@
 
         /* ===== Footer ===== */
         .site-footer {
-            background-color: #ffffff;
-            border-top: 1px solid #dee2e6;
+            background: linear-gradient(180deg, #10192e 0%, #1b2a47 55%, #101a30 100%);
+            color: #cfd7e6;
+            border-top: 4px solid #2a6f57;
         }
 
         .footer-logo {
-            width: 64px;
-            height: 64px;
+            width: 120px;
+            height: 120px;
             object-fit: contain;
             display: block;
             margin: 0 auto 1.25rem auto;
+            padding: 10px;
         }
 
         .footer-about {
             max-width: 680px;
             margin: 0 auto;
             text-align: center;
-            color: #495057;
+            color: #b7c1d6;
             line-height: 1.7;
         }
 
@@ -223,29 +331,34 @@
         }
 
         .section-gray {
-            background-color: #f8f9fa;
+            background-color: rgba(255, 255, 255, 0.03);
         }
 
         .section-title h2 {
             font-weight: 700;
-            color: #212529;
+            color: #ffffff;
         }
 
         .section-title p {
-            color: #6c757d;
+            color: #8b96ad;
         }
 
         .card-clean {
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
             padding: 1.75rem;
             height: 100%;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
 
         .card-clean p {
             margin-bottom: 1rem;
-            color: #495057;
+            color: #c4cce0;
+        }
+
+        .card-clean p strong {
+            color: #ffffff;
         }
 
         .card-clean p:last-child {
@@ -256,8 +369,9 @@
             text-align: center;
             padding: 1.25rem 0;
             font-size: 0.875rem;
-            color: #6c757d;
-            border-top: 1px solid #eee;
+            color: #8b96ad;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            background-color: #0c1424;
         }
     </style>
 </head>
@@ -265,7 +379,7 @@
 
 <div class="main-section">
 
-    <img src="{{ asset('assets/images/logo-abbr.png') }}" alt="" class="bg-watermark">
+    {{-- <img src="{{ asset('assets/images/logo-abbr.png') }}" alt="" class="bg-watermark"> --}}
 
     @php
         $isExpired = \Carbon\Carbon::parse($certification->expired_date)->isPast();
@@ -273,24 +387,46 @@
 
     <div class="content-wrapper">
 
-        {{-- Status icon: verified badge, overlaid with lock icon when expired --}}
         <div class="status-icon-wrapper {{ $isExpired ? 'expired' : 'active' }}">
             <div class="main-icon">
-                <i class="bi bi-patch-check-fill"></i>
+                <img src="{{ asset('storage/' . $certification->type->logo_certificate) }}" 
+                    alt="{{ $certification->type->type_certificate }}" 
+                    class="certificate-logo">
             </div>
+        </div>
+
+        <div class="d-flex justify-content-center mb-3">
             @if($isExpired)
-                <div class="lock-overlay">
-                    <i class="bi bi-lock-fill"></i>
-                </div>
+                <span class="status-badge status-expired">
+                    <i class="bi bi-x-octagon-fill"></i> EXPIRED
+                </span>
+            @else
+                <span class="status-badge status-active">
+                    <i class="bi bi-patch-check-fill"></i> ACTIVE
+                </span>
             @endif
         </div>
 
-        <div class="d-flex justify-content-center mb-4">
-            @if($isExpired)
-                <span class="status-badge status-expired">EXPIRED</span>
-            @else
-                <span class="status-badge status-active">ACTIVE</span>
-            @endif
+       <div class="company-info">
+            <div class="company-name">
+                <span class="icon-badge">
+                    <i class="bi bi-building"></i>
+                </span>
+                <span class="text-block">
+                    {{-- <span class="label-eyebrow">Certified Organization</span> --}}
+                    <span class="company-title">{{ $certification->company->name_company }}</span>
+                </span>
+            </div>
+
+            <div class="company-address">
+                <span class="icon-badge">
+                    <i class="bi bi-geo-alt"></i>
+                </span>
+                <span class="text-block">
+                    {{-- <span class="label-eyebrow">Registered Address</span> --}}
+                    <span class="address-text">{{ $certification->company->address_company }}</span>
+                </span>
+            </div>
         </div>
 
         <hr>
@@ -299,27 +435,20 @@
             <div class="info-label">Certificate Number</div>
             <div class="info-value">{{ $certification->number_certificate }}</div>
 
-            <div class="info-label">Certificate Title</div>
+            <div class="info-label">Standard</div>
             <div class="info-value">{{ $certification->type->type_certificate }}</div>
-            
+
             <div class="info-label">Description</div>
             <div class="info-value">{{ $certification->type->description_certificate }}</div>
-
-            <div class="info-label">Company</div>
-            <div class="info-value">{{ $certification->company->name_company }}</div>
-
-            <div class="info-label">Address</div>
-            <div class="info-value">{{ $certification->company->address_company }}</div>
-
 
             <div class="info-label">Scope of Activities</div>
             <div class="info-value">{{ $certification->type->scope_certificate }}</div>
 
             <div class="info-label">Issue Date</div>
-            <div class="info-value">{{ $certification->issues_date }}</div>
+            <div class="info-value">{{ \Carbon\Carbon::parse($certification->issues_date)->format('d F Y') }}</div>
 
             <div class="info-label">Expired Date</div>
-            <div class="info-value">{{ $certification->expired_date }}</div>
+            <div class="info-value">{{ \Carbon\Carbon::parse($certification->expired_date)->format('d F Y') }}</div>
         </div>
 
     </div>
