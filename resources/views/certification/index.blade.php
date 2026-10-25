@@ -48,24 +48,20 @@
 
                     <td>
                         <div class="d-flex align-items-center gap-1 flex-nowrap">
-
-                            <!-- PDF Final -->
-                            <a href="{{ route('certification.generatePdf', $row->id_certification) }}"
-                                class="btn btn-sm btn-danger"
-                                target="_blank"
-                                title="Generate PDF Final">
-                                <i class="bi bi-file-earmark-pdf-fill"></i>
-                            </a>
-
-                            <!-- PDF Draft -->
-                            <a href="{{ route('certification.generatePdfDraft', $row->id_certification) }}"
-                                class="btn btn-sm btn-warning"
-                                target="_blank"
-                                title="Generate PDF Draft">
-                                <i class="bi bi-file-earmark-text"></i>
-                            </a>
-
                             <x-action-dropdown>
+                                <li>
+                                    <a href="{{ route('certification.generatePdf', $row->id_certification) }}"
+                                        class="dropdown-item" target="_blank">
+                                        <i class="bi bi-file-earmark-pdf-fill me-2 text-danger"></i>Generate PDF Final
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('certification.generatePdfDraft', $row->id_certification) }}"
+                                        class="dropdown-item" target="_blank">
+                                        <i class="bi bi-file-earmark-text me-2 text-warning"></i>Generate PDF Draft
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <button type="button" class="dropdown-item" data-bs-toggle="modal"
                                         data-bs-target="#certificationModal{{ $row->id_certification }}">
