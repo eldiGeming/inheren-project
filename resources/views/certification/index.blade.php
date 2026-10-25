@@ -62,7 +62,7 @@
                                 class="btn btn-sm btn-warning"
                                 target="_blank"
                                 title="Generate PDF Draft">
-                                <i class="bi bi-pencil-square"></i>
+                                <i class="bi bi-file-earmark-text"></i>
                             </a>
 
                             <x-action-dropdown>
