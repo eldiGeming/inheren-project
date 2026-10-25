@@ -20,7 +20,7 @@
 }
 
 .action-col{
-    width:170px;
+    width:100px;
     white-space: nowrap;
 }
 
@@ -75,22 +75,22 @@
                             </td>
 
                             <td class="action-col">
-                                <div class="d-flex gap-2">
-                                    <button type="button"
-                                        class="btn btn-sm btn-warning"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#updateTypeCertificateModal{{ $row->id_type_certificate }}">
-                                        <i class="feather-edit me-1"></i>
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm btn-danger deleteTypeCertificateBtn"
-                                        data-url="{{ route('type-certificate.destroy', $row->id_type_certificate) }}"
-                                        data-id="{{ $row->id_type_certificate }}">
-                                        <i class="feather-trash-2 me-1"></i>
-                                    </button>
-                                </div>
+                                <x-action-dropdown>
+                                    <li>
+                                        <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                            data-bs-target="#updateTypeCertificateModal{{ $row->id_type_certificate }}">
+                                            <i class="feather-edit me-2 text-warning"></i>Edit
+                                        </button>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <button type="button" class="dropdown-item text-danger deleteTypeCertificateBtn"
+                                            data-url="{{ route('type-certificate.destroy', $row->id_type_certificate) }}"
+                                            data-id="{{ $row->id_type_certificate }}">
+                                            <i class="feather-trash-2 me-2"></i>Hapus
+                                        </button>
+                                    </li>
+                                </x-action-dropdown>
                             </td>
 
                         </tr>

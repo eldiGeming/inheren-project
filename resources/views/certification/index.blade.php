@@ -49,30 +49,44 @@
                     <td>
                         <div class="d-flex align-items-center gap-1 flex-nowrap">
 
-                            <button type="button"
-                                class="btn btn-sm btn-info text-white"
-                                data-bs-toggle="modal"
-                                data-bs-target="#certificationModal{{ $row->id_certification }}"
-                                title="Lihat">
-                                <i class="feather-eye"></i>
-                            </button>
+                            <!-- PDF Final -->
+                            <a href="{{ route('certification.generatePdf', $row->id_certification) }}"
+                                class="btn btn-sm btn-danger"
+                                target="_blank"
+                                title="Generate PDF Final">
+                                <i class="bi bi-file-earmark-pdf-fill"></i>
+                            </a>
 
-                            <button type="button"
+                            <!-- PDF Draft -->
+                            <a href="{{ route('certification.generatePdfDraft', $row->id_certification) }}"
                                 class="btn btn-sm btn-warning"
-                                data-bs-toggle="modal"
-                                data-bs-target="#updateCertificationModal{{ $row->id_certification }}"
-                                title="Edit">
-                                <i class="feather-edit"></i>
-                            </button>
+                                target="_blank"
+                                title="Generate PDF Draft">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
 
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-danger deleteCertificationBtn"
-                                data-url="{{ route('certification.destroy', $row->id_certification) }}"
-                                data-id="{{ $row->id_certification }}"
-                                title="Hapus">
-                                <i class="feather-trash-2"></i>
-                            </button>
+                            <x-action-dropdown>
+                                <li>
+                                    <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                        data-bs-target="#certificationModal{{ $row->id_certification }}">
+                                        <i class="feather-eye me-2 text-info"></i>Lihat
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                        data-bs-target="#updateCertificationModal{{ $row->id_certification }}">
+                                        <i class="feather-edit me-2 text-warning"></i>Edit
+                                    </button>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <button type="button" class="dropdown-item text-danger deleteCertificationBtn"
+                                        data-url="{{ route('certification.destroy', $row->id_certification) }}"
+                                        data-id="{{ $row->id_certification }}">
+                                        <i class="feather-trash-2 me-2"></i>Hapus
+                                    </button>
+                                </li>
+                            </x-action-dropdown>
                         </div>
                     </td>
 

@@ -34,23 +34,28 @@
                             <td>{{ $row->phone_company }}</td>
                             <td>{{ Str::limit($row->address_company, 40, '...') }}</td>
                             <td>
-                                <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
-                                        data-bs-target="#companyModal{{ $row->id_company }}">
-                                        <i class="feather-eye me-1"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                        data-bs-target="#updateCompanyModal{{ $row->id_company }}">
-                                        <i class="feather-edit me-1"></i>
-                                    </button>
-                                    <button 
-                                        type="button"
-                                        class="btn btn-sm btn-danger deleteCompanyBtn"
-                                        data-url="{{ route('company.destroy', $row->id_company) }}"
-                                        data-id="{{ $row->id_company }}">
-                                        <i class="feather-trash-2 me-1"></i>
-                                    </button>                                   
-                                </div>
+                                <x-action-dropdown>
+                                    <li>
+                                        <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                            data-bs-target="#companyModal{{ $row->id_company }}">
+                                            <i class="feather-eye me-2 text-info"></i>Lihat
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                            data-bs-target="#updateCompanyModal{{ $row->id_company }}">
+                                            <i class="feather-edit me-2 text-warning"></i>Edit
+                                        </button>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <button type="button" class="dropdown-item text-danger deleteCompanyBtn"
+                                            data-url="{{ route('company.destroy', $row->id_company) }}"
+                                            data-id="{{ $row->id_company }}">
+                                            <i class="feather-trash-2 me-2"></i>Hapus
+                                        </button>
+                                    </li>
+                                </x-action-dropdown>
                             </td>
                         </tr>
                         @endforeach
