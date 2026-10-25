@@ -14,6 +14,18 @@
 html.app-skin-dark .detail-row:hover{
     background: #1b2436;
 }
+
+/* Thumbnail foto & tombol unduh dokumen lama di modal edit, setinggi input file */
+.file-current{
+    width: 46px;
+    height: 46px;
+    object-fit: cover;
+    background-color: #f8f9fa;
+    font-size: 0; /* sembunyikan teks alt selama gambar dimuat */
+}
+html.app-skin-dark .file-current{
+    background-color: #1b2436;
+}
 </style>
 
 <div class="main-content">
@@ -154,9 +166,8 @@ html.app-skin-dark .detail-row:hover{
                             <span class="text-danger small error-text" id="error_pic_name"></span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Foto</label>
+                            <label class="form-label">Foto <small class="fw-normal text-muted">· JPG, PNG, WEBP, maks 2 MB</small></label>
                             <input type="file" name="photo" class="form-control" accept="image/jpeg,image/png,image/webp">
-                            <div class="form-text">JPG, PNG, atau WEBP, maks 2 MB</div>
                             <span class="text-danger small error-text" id="error_photo"></span>
                         </div>
 
@@ -168,13 +179,11 @@ html.app-skin-dark .detail-row:hover{
                                     <option value="{{ $iso }}">{{ $iso }}</option>
                                 @endforeach
                             </select>
-                            <div class="form-text">Pilih dari daftar atau ketik Standard baru</div>
                             <span class="text-danger small error-text" id="error_iso_standard"></span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Dokumen</label>
+                            <label class="form-label">Dokumen <small class="fw-normal text-muted">· semua jenis file, maks 5 MB</small></label>
                             <input type="file" name="document" class="form-control">
-                            <div class="form-text">Semua jenis file, maks 5 MB</div>
                             <span class="text-danger small error-text" id="error_document"></span>
                         </div>
 
@@ -266,14 +275,15 @@ html.app-skin-dark .detail-row:hover{
                             <span class="text-danger small error-text" id="error_pic_name_{{ $row->id_certification }}"></span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Foto</label>
-                            @if($row->photo_mime)
-                                <div class="mb-2">
-                                    <img src="{{ route('certification.photo', $row->id_certification) }}" width="100" class="img-thumbnail" loading="lazy" alt="Foto">
-                                </div>
-                            @endif
-                            <input type="file" name="photo" class="form-control" accept="image/jpeg,image/png,image/webp">
-                            <div class="form-text">JPG, PNG, atau WEBP, maks 2 MB. Kosongkan jika tidak diganti</div>
+                            <label class="form-label">Foto <small class="fw-normal text-muted">· JPG, PNG, WEBP, maks 2 MB</small></label>
+                            <div class="d-flex gap-2">
+                                @if($row->photo_mime)
+                                    <a href="{{ route('certification.photo', $row->id_certification) }}" target="_blank" class="flex-shrink-0" title="Lihat foto saat ini">
+                                        <img src="{{ route('certification.photo', $row->id_certification) }}" class="file-current rounded border" loading="lazy" alt="Foto saat ini">
+                                    </a>
+                                @endif
+                                <input type="file" name="photo" class="form-control" accept="image/jpeg,image/png,image/webp">
+                            </div>
                             <span class="text-danger small error-text" id="error_photo_{{ $row->id_certification }}"></span>
                         </div>
 
@@ -285,20 +295,19 @@ html.app-skin-dark .detail-row:hover{
                                     <option value="{{ $iso }}" {{ strcasecmp($iso, $row->type->type_certificate ?? '') === 0 ? 'selected' : '' }}>{{ $iso }}</option>
                                 @endforeach
                             </select>
-                            <div class="form-text">Pilih dari daftar atau ketik Standard baru</div>
                             <span class="text-danger small error-text" id="error_iso_standard_{{ $row->id_certification }}"></span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Dokumen</label>
-                            @if($row->document_name)
-                                <div class="mb-2">
-                                    <a href="{{ route('certification.document', $row->id_certification) }}" class="small">
-                                        <i class="bi bi-download me-1"></i>{{ $row->document_name }}
+                            <label class="form-label">Dokumen <small class="fw-normal text-muted">· semua jenis file, maks 5 MB</small></label>
+                            <div class="d-flex gap-2">
+                                @if($row->document_name)
+                                    <a href="{{ route('certification.document', $row->id_certification) }}" class="file-current btn btn-light border flex-shrink-0 d-flex align-items-center justify-content-center p-0"
+                                        title="Unduh dokumen saat ini: {{ $row->document_name }}" aria-label="Unduh dokumen saat ini: {{ $row->document_name }}">
+                                        <i class="bi bi-download"></i>
                                     </a>
-                                </div>
-                            @endif
-                            <input type="file" name="document" class="form-control">
-                            <div class="form-text">Semua jenis file, maks 5 MB. Kosongkan jika tidak diganti</div>
+                                @endif
+                                <input type="file" name="document" class="form-control">
+                            </div>
                             <span class="text-danger small error-text" id="error_document_{{ $row->id_certification }}"></span>
                         </div>
 
@@ -322,6 +331,10 @@ html.app-skin-dark .detail-row:hover{
                             <label class="form-label">RC</label>
                             <input type="date" name="rc_date" value="{{ $dateValue($row->rc_date) }}" class="form-control">
                             <span class="text-danger small error-text" id="error_rc_date_{{ $row->id_certification }}"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-text mt-0">Foto dan dokumen lama tetap tersimpan jika tidak memilih file baru.</div>
                         </div>
                     </div>
                 </div>
