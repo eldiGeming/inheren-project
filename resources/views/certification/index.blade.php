@@ -3,6 +3,19 @@
 @section('title', 'Certification')
 
 @section('content')
+<style>
+/* Hover baris di modal detail, mengikuti mode terang/gelap */
+.detail-row{
+    transition: background 0.3s;
+}
+.detail-row:hover{
+    background: #f8f9fa;
+}
+html.app-skin-dark .detail-row:hover{
+    background: #1b2436;
+}
+</style>
+
 <div class="main-content">
     <div class="card stretch stretch-full">
         <div class="d-flex justify-content-end p-3">
@@ -337,27 +350,27 @@
             <!-- Body -->
             <div class="modal-body">
                 <!-- Company Info -->
-                <div class="row mb-3 py-2 border-bottom" style="transition: background 0.3s;" onmouseover="this.style.background='#f8f9fa';" onmouseout="this.style.background='transparent';">
+                <div class="row mb-3 py-2 border-bottom detail-row">
                     <div class="col-md-4 fw-bold">Company Name</div>
                     <div class="col-md-8">{{ $row->company->name_company }}</div>
                 </div>
-                <div class="row mb-3 py-2 border-bottom" style="transition: background 0.3s;" onmouseover="this.style.background='#f8f9fa';" onmouseout="this.style.background='transparent';">
+                <div class="row mb-3 py-2 border-bottom detail-row">
                     <div class="col-md-4 fw-bold">Description</div>
                     <div class="col-md-8">{{ $row->company->description_company }}</div>
                 </div>
-                <div class="row mb-3 py-2 border-bottom" style="transition: background 0.3s;" onmouseover="this.style.background='#f8f9fa';" onmouseout="this.style.background='transparent';">
+                <div class="row mb-3 py-2 border-bottom detail-row">
                     <div class="col-md-4 fw-bold">Phone</div>
                     <div class="col-md-8">{{ $row->company->phone_company }}</div>
                 </div>
-                <div class="row mb-3 py-2 border-bottom" style="transition: background 0.3s;" onmouseover="this.style.background='#f8f9fa';" onmouseout="this.style.background='transparent';">
+                <div class="row mb-3 py-2 border-bottom detail-row">
                     <div class="col-md-4 fw-bold">Email</div>
                     <div class="col-md-8">{{ $row->company->email_company }}</div>
                 </div>
-                <div class="row mb-3 py-2 border-bottom" style="transition: background 0.3s;" onmouseover="this.style.background='#f8f9fa';" onmouseout="this.style.background='transparent';">
+                <div class="row mb-3 py-2 border-bottom detail-row">
                     <div class="col-md-4 fw-bold">Address</div>
                     <div class="col-md-8">{{ $row->company->address_company }}</div>
                 </div>
-                <div class="row mb-3 py-2 border-bottom" onmouseout="this.style.background='transparent';">
+                <div class="row mb-3 py-2 border-bottom detail-row">
                     <div class="col-md-4 fw-bold">Logo</div>
                     <div class="col-md-8">
                         @if($row->company->logo_company)
@@ -369,19 +382,19 @@
                 </div>
 
                 <!-- Certificate Info -->
-                <div class="row mb-3 py-2 border-bottom" style="transition: background 0.3s;" onmouseover="this.style.background='#f8f9fa';" onmouseout="this.style.background='transparent';">
+                <div class="row mb-3 py-2 border-bottom detail-row">
                     <div class="col-md-4 fw-bold">Type Certificate</div>
                     <div class="col-md-8">{{ $row->type->type_certificate }}</div>
                 </div>
-                <div class="row mb-3 py-2 border-bottom" style="transition: background 0.3s;" onmouseover="this.style.background='#f8f9fa';" onmouseout="this.style.background='transparent';">
+                <div class="row mb-3 py-2 border-bottom detail-row">
                     <div class="col-md-4 fw-bold">Description Type Certificate</div>
                     <div class="col-md-8">{{ $row->type->description_certificate }}</div>
                 </div>
-                <div class="row mb-3 py-2 border-bottom" style="transition: background 0.3s;" onmouseover="this.style.background='#f8f9fa';" onmouseout="this.style.background='transparent';">
+                <div class="row mb-3 py-2 border-bottom detail-row">
                     <div class="col-md-4 fw-bold">Issues Date (IA)</div>
                     <div class="col-md-8">{{ $row->issues_date_formatted }}</div>
                 </div>
-                <div class="row mb-3 py-2 border-bottom" style="transition: background 0.3s;" onmouseover="this.style.background='#f8f9fa';" onmouseout="this.style.background='transparent';">
+                <div class="row mb-3 py-2 border-bottom detail-row">
                     <div class="col-md-4 fw-bold">Expired Date</div>
                     <div class="col-md-8">{{ $row->expired_date_formatted }}</div>
                 </div>
@@ -399,7 +412,7 @@
                     'SA2' => $dateText($row->sa2_date),
                     'RC' => $dateText($row->rc_date),
                 ] as $label => $value)
-                <div class="row mb-3 py-2 border-bottom" style="transition: background 0.3s;" onmouseover="this.style.background='#f8f9fa';" onmouseout="this.style.background='transparent';">
+                <div class="row mb-3 py-2 border-bottom detail-row">
                     <div class="col-md-4 fw-bold">{{ $label }}</div>
                     <div class="col-md-8">{{ $value ?: '-' }}</div>
                 </div>
@@ -428,10 +441,7 @@
                         @endif
                     </div>
                 </div>
-                <div class="row mb-3 py-2 border-bottom"
-                    style="transition: background 0.3s;"
-                    onmouseover="this.style.background='#f8f9fa';"
-                    onmouseout="this.style.background='transparent';">
+                <div class="row mb-3 py-2 border-bottom detail-row">
                     
                     <div class="col-md-4 fw-bold">QR Code</div>
                     <div class="col-md-8">

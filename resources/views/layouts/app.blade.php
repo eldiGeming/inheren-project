@@ -5,6 +5,15 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Inheren Sertifikasi</title>
+
+    <script>
+        // Terapkan dark mode tersimpan sebelum halaman tampil, supaya tidak berkedip terang
+        try {
+            if (localStorage.getItem('app-skin-dark') === 'app-skin-dark') {
+                document.documentElement.classList.add('app-skin-dark');
+            }
+        } catch (e) {}
+    </script>
     <link rel="icon" href="{{ asset('assets/images/logo-abbr.png') }}" type="image/png">
 
     <!-- Vendors CSS -->
@@ -20,6 +29,22 @@
     <style>
         body.modal-open .nxl-container {
             filter: none !important;
+        }
+
+        /* Kontrol bawaan browser (ikon kalender, tombol file, scrollbar) ikut gelap */
+        html.app-skin-dark {
+            color-scheme: dark;
+        }
+
+        html.app-skin-dark .form-control::file-selector-button,
+        html.app-skin-dark .form-control:hover:not(:disabled):not([readonly])::file-selector-button {
+            background-color: #1b2436;
+            color: #b1b4c0;
+        }
+
+        /* Theme membalik warna logo di dark mode (untuk logo bawaan template); logo Inheren sudah terbaca di latar gelap */
+        html.app-skin-dark .nxl-navigation .m-header .logo-lg {
+            filter: none;
         }
     </style>
 </head>
@@ -44,6 +69,19 @@
 <script src="{{ asset('assets/vendors/js/select2.min.js') }}"></script>
 <script src="{{ asset('assets/vendors/js/select2-active.min.js') }}"></script>
 <script src="{{ asset('assets/js/common-init.min.js') }}"></script>
+
+<script>
+    // Tombol dark/light mode di header. Ikon diatur CSS theme lewat class app-skin-dark,
+    // key localStorage sama dengan theme-customizer bawaan template.
+    $(document).on('click', '.dark-button, .light-button', function (e) {
+        e.preventDefault();
+        let dark = $(this).hasClass('dark-button');
+        $('html').toggleClass('app-skin-dark', dark);
+        try {
+            localStorage.setItem('app-skin-dark', dark ? 'app-skin-dark' : 'app-skin-light');
+        } catch (err) {}
+    });
+</script>
 
 <!-- SweetAlert2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
