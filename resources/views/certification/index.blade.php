@@ -73,22 +73,6 @@
                                 title="Hapus">
                                 <i class="feather-trash-2"></i>
                             </button>
-
-                            <!-- PDF Final -->
-                            <a href="{{ route('certification.generatePdf', $row->id_certification) }}"
-                                class="btn btn-sm btn-danger"
-                                target="_blank"
-                                title="Generate PDF Final">
-                                <i class="bi bi-file-earmark-pdf-fill"></i>
-                            </a>
-
-                            <!-- PDF Draft -->
-                            <a href="{{ route('certification.generatePdfDraft', $row->id_certification) }}"
-                                class="btn btn-sm btn-warning"
-                                target="_blank"
-                                title="Generate PDF Draft">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
                         </div>
                     </td>
 
