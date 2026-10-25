@@ -5,12 +5,29 @@ use Carbon\Carbon;
 use App\Models\Certification;
 use App\Models\Company;
 use App\Models\TypeCertificate;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class CertificationController extends Controller
 {
+    // Pilihan default dropdown Standard (ISO) di form certification
+    private const ISO_OPTIONS = [
+        'ISO 9001',
+        'ISO 14001',
+        'ISO 45001',
+        'ISO 27001',
+        'ISO 22000',
+        'HACCP',
+        'ISO 37001',
+        'ISO 13485',
+        'SMK3',
+        'SNI',
+    ];
+
     /**
      * Display a listing of the resource.
      */
@@ -21,8 +38,16 @@ class CertificationController extends Controller
 
         // Ambil type certificate yang tidak dihapus
         $types = TypeCertificate::where('is_deleted', 0)->get();
-        // Ambil semua certification beserta relasi
+
+        // Pilihan dropdown Standard: daftar ISO default + Standard yang sudah ada di database
+        $isoOptions = collect(self::ISO_OPTIONS)
+            ->merge($types->pluck('type_certificate'))
+            ->unique(fn ($name) => strtolower(trim($name)))
+            ->values();
+
+        // Ambil semua certification beserta relasi (tanpa kolom BLOB agar list tetap ringan)
         $allCertification = Certification::with(['company', 'type'])
+            ->select(array_values(array_diff(Schema::getColumnListing('certifications'), ['photo', 'document'])))
             ->where('is_deleted', 0)
             ->get()
             ->map(function ($cert) {
@@ -43,25 +68,24 @@ class CertificationController extends Controller
         return view('certification.index', [
             'allCertification' => $allCertification,
             'companies' => $companies,
-            'types' => $types
+            'types' => $types,
+            'isoOptions' => $isoOptions
         ]);
     }
 
     public function store(Request $request)
     {
         // Validasi
-        $request->validate([
-            'id_company' => 'required|exists:companies,id_company',
-            'id_type_certificate' => 'required|exists:type_certificates,id_type_certificate',
-            'issues_date' => 'required|date',
-        ]);
+        $request->validate($this->rules(), [], $this->attributes());
+
+        $idTypeCertificate = $this->resolveTypeCertificate($request->iso_standard);
 
         $issuesDate = Carbon::parse($request->issues_date);
         $expiredDate = $issuesDate->copy()->addYear();
 
         // Generate nomor urut terbaru untuk id_company dan id_type_certificate
         $lastCert = Certification::where('id_company', $request->id_company)
-            ->where('id_type_certificate', $request->id_type_certificate)
+            ->where('id_type_certificate', $idTypeCertificate)
             ->orderBy('id_certification', 'desc')
             ->first();
 
@@ -72,7 +96,7 @@ class CertificationController extends Controller
         $idCompanyPadded = str_pad($request->id_company, 2, '0', STR_PAD_LEFT);
 
         // id_type_certificate 1 digit
-        $idTypePadded = $request->id_type_certificate; // as is, 1 digit
+        $idTypePadded = $idTypeCertificate; // as is, 1 digit
 
         // bulan dan tahun 2 digit
         $month = $issuesDate->format('m');
@@ -82,14 +106,18 @@ class CertificationController extends Controller
         $number = $nomorUrut . $idCompanyPadded . $idTypePadded . $month . $year;
 
         // Simpan sertifikasi
-        $certification = Certification::create([
+        $certification = new Certification([
             'id_company' => $request->id_company,
-            'id_type_certificate' => $request->id_type_certificate,
+            'id_type_certificate' => $idTypeCertificate,
             'number_certificate' => $number,
             'issues_date' => $issuesDate,
             'expired_date' => $expiredDate,
-            'barcode_certificate' => $number, 
+            'barcode_certificate' => $number,
         ]);
+        $this->fillClientData($certification, $request);
+        if ($oversize = $this->saveWithFiles($certification)) {
+            return $oversize;
+        }
 
         $certification->load(['company', 'type']);
         $certification->issues_date_formatted = $issuesDate->format('d-F-Y');
@@ -106,22 +134,21 @@ class CertificationController extends Controller
     {
         $certification = Certification::findOrFail($id);
 
-        $request->validate([
-            'id_company' => 'required|exists:companies,id_company',
-            'id_type_certificate' => 'required|exists:type_certificates,id_type_certificate',
-            'issues_date' => 'required|date',
-        ]);
+        $request->validate($this->rules(), [], $this->attributes());
 
         $issuesDate = Carbon::parse($request->issues_date);
         $expiredDate = $issuesDate->copy()->addYear();
 
         $certification->id_company = $request->id_company;
-        $certification->id_type_certificate = $request->id_type_certificate;
+        $certification->id_type_certificate = $this->resolveTypeCertificate($request->iso_standard);
         $certification->issues_date = $issuesDate;
         $certification->expired_date = $expiredDate;
         $certification->barcode_certificate = $certification->number_certificate;
+        $this->fillClientData($certification, $request);
 
-        $certification->save();
+        if ($oversize = $this->saveWithFiles($certification)) {
+            return $oversize;
+        }
 
         $certification->load(['company', 'type']);
 
@@ -139,6 +166,128 @@ class CertificationController extends Controller
         $company->save();
 
         return response()->json(['message' => 'Certification has been deleted.']);
+    }
+
+    // Tampilkan foto (BLOB) certification
+    public function photo($id)
+    {
+        $certification = Certification::select('photo', 'photo_mime')->findOrFail($id);
+        abort_if(! $certification->photo, 404);
+
+        return response($certification->photo)
+            ->header('Content-Type', $certification->photo_mime)
+            ->header('X-Content-Type-Options', 'nosniff');
+    }
+
+    // Download dokumen (BLOB) certification
+    public function document($id)
+    {
+        $certification = Certification::select('document', 'document_name', 'document_mime')->findOrFail($id);
+        abort_if(! $certification->document, 404);
+
+        return response()->streamDownload(function () use ($certification) {
+            echo $certification->document;
+        }, $certification->document_name, [
+            'Content-Type' => $certification->document_mime,
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
+    private function rules(): array
+    {
+        return [
+            'id_company' => 'required|exists:companies,id_company',
+            'iso_standard' => 'required|string|max:255',
+            'issues_date' => 'required|date',
+            'sales_name' => 'nullable|string|max:255',
+            'scope' => 'nullable|string',
+            'legality' => 'nullable|string|max:255',
+            'pic_name' => 'nullable|string|max:255',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'document' => 'nullable|file|max:5120',
+            'sa1_date' => 'nullable|date',
+            'sa2_date' => 'nullable|date',
+            'rc_date' => 'nullable|date',
+        ];
+    }
+
+    // Nama field di pesan error, sesuai label form
+    private function attributes(): array
+    {
+        return [
+            'id_company' => 'client name',
+            'iso_standard' => 'standard',
+            'issues_date' => 'IA',
+            'pic_name' => 'PIC name',
+            'photo' => 'foto',
+            'document' => 'dokumen',
+            'sa1_date' => 'SA1',
+            'sa2_date' => 'SA2',
+            'rc_date' => 'RC',
+        ];
+    }
+
+    // Cari Standard berdasarkan nama (tidak peka huruf besar/kecil), buat baru jika belum ada
+    private function resolveTypeCertificate(string $name): int
+    {
+        $name = trim($name);
+
+        $type = TypeCertificate::where('is_deleted', 0)
+            ->whereRaw('LOWER(type_certificate) = ?', [strtolower($name)])
+            ->first();
+
+        if (! $type) {
+            $type = TypeCertificate::create([
+                'type_certificate' => $name,
+                'description_certificate' => $name,
+                'scope_certificate' => '',
+            ]);
+        }
+
+        return $type->id_type_certificate;
+    }
+
+    // Simpan certification; jika foto + dokumen melebihi max_allowed_packet MySQL, kembalikan error 422
+    private function saveWithFiles(Certification $certification): ?JsonResponse
+    {
+        try {
+            $certification->save();
+
+            return null;
+        } catch (QueryException $e) {
+            // 1153: Got a packet bigger than 'max_allowed_packet' bytes
+            if (($e->errorInfo[1] ?? null) != 1153) {
+                throw $e;
+            }
+
+            $message = 'Ukuran foto + dokumen melebihi batas server database. Gunakan file yang lebih kecil.';
+
+            return response()->json([
+                'message' => $message,
+                'errors' => ['photo' => [$message], 'document' => [$message]],
+            ], 422);
+        }
+    }
+
+    // Isi field Data Based Client; foto & dokumen hanya diganti jika ada upload baru
+    private function fillClientData(Certification $certification, Request $request): void
+    {
+        $certification->fill($request->only([
+            'sales_name', 'scope', 'legality', 'pic_name', 'sa1_date', 'sa2_date', 'rc_date',
+        ]));
+
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+            $certification->photo = $file->get();
+            $certification->photo_mime = $file->getMimeType();
+        }
+
+        if ($request->hasFile('document')) {
+            $file = $request->file('document');
+            $certification->document = $file->get();
+            $certification->document_name = $file->getClientOriginalName();
+            $certification->document_mime = $file->getMimeType() ?: 'application/octet-stream';
+        }
     }
 
     public function show($id)
