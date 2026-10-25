@@ -454,6 +454,23 @@ $(document).ready(function() {
         pageLength: 10
     });
 
+    // Dropdown Standard selalu menempel tepat di bawah field. Bawaan Select2 (attachBody) menghitung
+    // posisi dengan JS sehingga di dalam modal yang di-scroll bisa meleset atau berbalik ke atas.
+    let s2 = $.fn.select2.amd.require;
+    let Utils = s2('select2/utils');
+    function AttachBelowField(decorated, $element, options){
+        decorated.call(this, $element, options);
+    }
+    AttachBelowField.prototype.position = function(decorated, $dropdown, $container){
+        $container.find('.dropdown-wrapper').removeAttr('aria-hidden').append($dropdown);
+        $dropdown.addClass('select2-dropdown--below');
+        $container.addClass('select2-container--below');
+    };
+    let standardDropdown = Utils.Decorate(
+        Utils.Decorate(Utils.Decorate(s2('select2/dropdown'), s2('select2/dropdown/search')), s2('select2/dropdown/closeOnSelect')),
+        AttachBelowField
+    );
+
     // Dropdown Standard: pilih dari daftar atau ketik Standard baru
     $('.iso-standard-select').each(function(){
         $(this).select2({
@@ -461,7 +478,13 @@ $(document).ready(function() {
             tags: true,
             width: '100%',
             placeholder: '-- Select or type Standard --',
-            dropdownParent: $(this).closest('.modal')
+            dropdownAdapter: standardDropdown
+        }).on('select2:open', function(){
+            // Pastikan daftar pilihan terlihat penuh di dalam modal (setelah hasil selesai di-render)
+            let dropdown = $(this).next('.select2-container').find('.select2-dropdown')[0];
+            setTimeout(function(){
+                dropdown.scrollIntoView({ block: 'nearest' });
+            });
         });
     });
 
