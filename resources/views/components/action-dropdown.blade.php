@@ -9,6 +9,12 @@
 </div>
 
 @once
+<style>
+/* Di atas header dashboard (z-index 1025), di bawah modal (1050+) */
+.action-dropdown .dropdown-menu{
+    z-index: 1030;
+}
+</style>
 @push('scripts')
 <script>
 // Menu aksi memakai posisi fixed agar tidak terpotong overflow .table-responsive / card.
@@ -17,7 +23,20 @@
 window.addEventListener('click', function (e) {
     let toggle = e.target.closest('.action-dropdown [data-bs-toggle="dropdown"]');
     if (toggle && !bootstrap.Dropdown.getInstance(toggle)) {
-        new bootstrap.Dropdown(toggle, { popperConfig: { strategy: 'fixed' } });
+        new bootstrap.Dropdown(toggle, {
+            popperConfig: function (defaultConfig) {
+                // Area di bawah header fixed dianggap tidak tersedia, dan menu digeser agar selalu muat di layar
+                let header = document.querySelector('.nxl-header');
+                let padding = { top: (header ? header.offsetHeight : 0) + 8, bottom: 8 };
+                return Object.assign({}, defaultConfig, {
+                    strategy: 'fixed',
+                    modifiers: defaultConfig.modifiers.concat([
+                        { name: 'flip', options: { padding: padding } },
+                        { name: 'preventOverflow', options: { altAxis: true, tether: false, padding: padding } },
+                    ]),
+                });
+            }
+        });
     }
 }, true);
 </script>
