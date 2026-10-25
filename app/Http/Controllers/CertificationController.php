@@ -90,7 +90,6 @@ class CertificationController extends Controller
             ->first();
 
         $lastNumber = $lastCert ? intval(substr($lastCert->number_certificate, 0, 3)) : 0;
-        $nomorUrut = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT); // 3 digit
 
         // id_company 2 digit
         $idCompanyPadded = str_pad($request->id_company, 2, '0', STR_PAD_LEFT);
@@ -102,8 +101,13 @@ class CertificationController extends Controller
         $month = $issuesDate->format('m');
         $year = $issuesDate->format('y');
 
-        // Gabungkan menjadi nomor 10 digit
-        $number = $nomorUrut . $idCompanyPadded . $idTypePadded . $month . $year;
+        // Gabungkan menjadi nomor 10 digit. Nomor yang sudah terpakai dilewati, mis. milik sertifikat
+        // yang Client/Standard-nya diganti lewat Edit sehingga tidak terhitung di $lastCert
+        do {
+            $lastNumber++;
+            $nomorUrut = str_pad($lastNumber, 3, '0', STR_PAD_LEFT); // 3 digit
+            $number = $nomorUrut . $idCompanyPadded . $idTypePadded . $month . $year;
+        } while (Certification::where('number_certificate', $number)->exists());
 
         // Simpan sertifikasi
         $certification = new Certification([
