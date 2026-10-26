@@ -18,24 +18,11 @@ class Certification extends Model
         'expired_date',
         'barcode_certificate',
         'reminder_sent_at',
-        'sales_name',
-        'scope',
-        'legality',
-        'pic_name',
-        'sa1_date',
-        'sa2_date',
-        'rc_date',
         'is_deleted',
         'created_by',
         'created_at',
         'updated_by',
         'updated_at'
-    ];
-
-    // BLOB foto & dokumen tidak ikut ke JSON, diakses lewat route certification.photo / certification.document
-    protected $hidden = [
-        'photo',
-        'document'
     ];
 
     public function company()

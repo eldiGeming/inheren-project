@@ -4,6 +4,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CompanyProfileController;
 use App\Http\Controllers\TypeCertificateController;
 use App\Http\Controllers\CertificationController;
+use App\Http\Controllers\ClientController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
 
@@ -46,8 +47,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/certification/pdf/{id}', [CertificationController::class, 'generatePdf'])->name('certification.generatePdf');
     Route::get('/certification/pdf-draft/{id}', [CertificationController::class, 'generatePdfDraft'])->name('certification.generatePdfDraft');
     Route::get('/certification/image/{id}', [CertificationController::class, 'generateCertificateImage'])->name('certification.generateCertificateImage');
-    Route::get('/certification/photo/{id}', [CertificationController::class, 'photo'])->name('certification.photo');
-    Route::get('/certification/document/{id}', [CertificationController::class, 'document'])->name('certification.document');
+
+    Route::get('/client', [ClientController::class, 'index'])->name('client.index');
+    Route::post('/client', [ClientController::class, 'store'])->name('client.store');
+    Route::patch('/client/{id}', [ClientController::class, 'update'])->name('client.update');
+    Route::delete('/client/{id}', [ClientController::class, 'destroy'])->name('client.destroy');
+    Route::get('/client/photo/{id}', [ClientController::class, 'photo'])->name('client.photo');
+    Route::get('/client/document/{id}', [ClientController::class, 'document'])->name('client.document');
 
     Route::get('/profile', [CompanyProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [CompanyProfileController::class, 'update'])->name('profile.update');

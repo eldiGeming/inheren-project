@@ -21,7 +21,7 @@
 
                 <li class="nxl-item">
                     <a href="{{ url('/type-certificate') }}" 
-                    class="nxl-link {{ request()->is('certificateType*') ? 'active' : '' }}">
+                    class="nxl-link {{ request()->is('type-certificate*') ? 'active' : '' }}">
                         <span class="nxl-micon">
                             <i class="bi bi-clipboard2-check-fill"></i>
                         </span>
@@ -36,6 +36,16 @@
                             <i class="bi bi-award-fill"></i>
                         </span>
                         <span class="nxl-mtext">Certification</span>
+                    </a>
+                </li>
+
+                <li class="nxl-item">
+                    <a href="{{ url('/client') }}"
+                    class="nxl-link {{ request()->is('client*') ? 'active' : '' }}">
+                        <span class="nxl-micon">
+                            <i class="bi bi-person-vcard-fill"></i>
+                        </span>
+                        <span class="nxl-mtext">Data Client</span>
                     </a>
                 </li>
 
