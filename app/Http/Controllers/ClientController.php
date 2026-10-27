@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\Company;
 use App\Models\TypeCertificate;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
@@ -33,12 +34,24 @@ class ClientController extends Controller
             ->unique(fn ($name) => strtolower(trim($name)))
             ->values();
 
+        // Pilihan dropdown Client Name: nama yang pernah diinput + nama di menu Company
+        $clientNames = Client::where('is_deleted', 0)->pluck('client_name')
+            ->merge(Company::where('is_deleted', 0)->pluck('name_company'))
+            ->map(fn ($name) => trim($name))
+            ->filter()
+            ->unique(fn ($name) => strtolower($name))
+            ->sort(SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
+
+        $salesOptions = $this->contactOptions('sales_name', 'sales_phone');
+        $picOptions = $this->contactOptions('pic_name', 'pic_phone');
+
         // Ambil semua client tanpa kolom BLOB agar list tetap ringan
         $allClient = Client::select(array_values(array_diff(Schema::getColumnListing('clients'), ['photo', 'document'])))
             ->where('is_deleted', 0)
             ->get();
 
-        return view('client.index', compact('allClient', 'isoOptions'));
+        return view('client.index', compact('allClient', 'isoOptions', 'clientNames', 'salesOptions', 'picOptions'));
     }
 
     public function store(Request $request)
@@ -108,14 +121,50 @@ class ClientController extends Controller
         ]);
     }
 
+    // Pilihan dropdown Sales / PIC dari data client yang sudah ada, sehingga entri baru otomatis tersedia
+    // di input berikutnya. Tiap nama membawa nomor HP terakhirnya, tiap nomor membawa nama pemiliknya.
+    private function contactOptions(string $nameColumn, string $phoneColumn): array
+    {
+        $rows = Client::where('is_deleted', 0)
+            ->where(fn ($query) => $query->whereNotNull($nameColumn)->orWhereNotNull($phoneColumn))
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id_client')
+            ->get([$nameColumn.' as name', $phoneColumn.' as phone']);
+
+        // Satu nama tanpa membedakan huruf besar/kecil; ejaan & nomor HP terbaru yang dipakai
+        $names = $rows->whereNotNull('name')
+            ->groupBy(fn ($row) => strtolower($row->name))
+            ->map(fn ($group) => [
+                'name' => $group->first()->name,
+                'phone' => $group->pluck('phone')->filter()->first(),
+            ])
+            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE);
+
+        $phones = $rows->whereNotNull('phone')
+            ->unique('phone')
+            ->map(fn ($row) => [
+                'phone' => $row->phone,
+                'name' => $row->name ? $names[strtolower($row->name)]['name'] : null,
+            ])
+            ->sortBy(fn ($item) => strtolower($item['name'] ?? '').' '.$item['phone'], SORT_NATURAL)
+            ->values();
+
+        return ['names' => $names->values(), 'phones' => $phones];
+    }
+
     private function rules(): array
     {
+        // Angka dengan pemisah spasi / - / . / kurung, boleh diawali +, minimal 6 digit
+        $phone = ['nullable', 'string', 'max:30', 'regex:/^\+?(?:[\s().-]*\d){6,}[\s().-]*$/'];
+
         return [
             'client_name' => 'required|string|max:255',
             'sales_name' => 'nullable|string|max:255',
+            'sales_phone' => $phone,
             'scope' => 'nullable|string',
             'legality' => 'nullable|string|max:255',
             'pic_name' => 'nullable|string|max:255',
+            'pic_phone' => $phone,
             'iso_standard' => 'nullable|string|max:255',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'document' => 'nullable|file|max:5120',
@@ -131,8 +180,10 @@ class ClientController extends Controller
     {
         return [
             'client_name' => 'client name',
+            'sales_phone' => 'no. HP sales',
             'iso_standard' => 'standard',
             'pic_name' => 'PIC name',
+            'pic_phone' => 'no. HP PIC',
             'photo' => 'foto',
             'document' => 'dokumen',
             'ia_date' => 'IA',
@@ -171,6 +222,11 @@ class ClientController extends Controller
             'client_name', 'sales_name', 'scope', 'legality', 'pic_name', 'iso_standard',
             'ia_date', 'sa1_date', 'sa2_date', 'rc_date',
         ]));
+
+        // Nomor HP disimpan tanpa spasi/tanda baca agar nomor yang sama tidak muncul dua kali di dropdown
+        foreach (['sales_phone', 'pic_phone'] as $field) {
+            $client->$field = $request->filled($field) ? preg_replace('/[^\d+]/', '', $request->input($field)) : null;
+        }
 
         if ($request->hasFile('photo')) {
             $file = $request->file('photo');

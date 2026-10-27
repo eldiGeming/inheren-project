@@ -26,6 +26,11 @@ html.app-skin-dark .detail-row:hover{
 html.app-skin-dark .file-current{
     background-color: #1b2436;
 }
+
+/* Tombol hapus pilihan Select2 4.1 berupa <button>; buang bingkai bawaan browser */
+.select2-container--bootstrap-5 .select2-selection__clear{
+    border: 0;
+}
 </style>
 
 @php
@@ -70,9 +75,19 @@ html.app-skin-dark .file-current{
 
                             <td>{{ $row->iso_standard ?: '-' }}</td>
 
-                            <td>{{ $row->sales_name ?: '-' }}</td>
+                            <td>
+                                {{ $row->sales_name ?: '-' }}
+                                @if($row->sales_phone)
+                                    <div class="small text-muted">{{ $row->sales_phone }}</div>
+                                @endif
+                            </td>
 
-                            <td>{{ $row->pic_name ?: '-' }}</td>
+                            <td>
+                                {{ $row->pic_name ?: '-' }}
+                                @if($row->pic_phone)
+                                    <div class="small text-muted">{{ $row->pic_phone }}</div>
+                                @endif
+                            </td>
 
                             <td class="text-center">{{ $dateText($row->ia_date) ?: '-' }}</td>
 
@@ -125,42 +140,85 @@ html.app-skin-dark .file-current{
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">Client Name</label>
-                            <input type="text" name="client_name" class="form-control">
+                            <select name="client_name" class="form-control tag-select" data-placeholder="-- Select or type Client Name --">
+                                <option value=""></option>
+                                @foreach($clientNames as $name)
+                                    <option value="{{ $name }}">{{ $name }}</option>
+                                @endforeach
+                            </select>
                             <span class="text-danger small error-text" id="error_client_name"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Sales Name</label>
-                            <input type="text" name="sales_name" class="form-control">
-                            <span class="text-danger small error-text" id="error_sales_name"></span>
+                        <div class="col-lg-6 mb-3">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="form-label">Sales Name</label>
+                                    <select name="sales_name" class="form-control tag-select" data-placeholder="Select or type" data-phone-field="sales_phone">
+                                        <option value=""></option>
+                                        @foreach($salesOptions['names'] as $sales)
+                                            <option value="{{ $sales['name'] }}" data-hint="{{ $sales['phone'] }}">{{ $sales['name'] }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="text-danger small error-text" id="error_sales_name"></span>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">No. HP</label>
+                                    <select name="sales_phone" class="form-control tag-select phone-select" data-placeholder="Select or type" data-name-field="sales_name">
+                                        <option value=""></option>
+                                        @foreach($salesOptions['phones'] as $sales)
+                                            <option value="{{ $sales['phone'] }}" data-hint="{{ $sales['name'] }}">{{ $sales['phone'] }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="text-danger small error-text" id="error_sales_phone"></span>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">Scope</label>
                             <input type="text" name="scope" class="form-control">
                             <span class="text-danger small error-text" id="error_scope"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">Legalitas</label>
                             <input type="text" name="legality" class="form-control">
                             <span class="text-danger small error-text" id="error_legality"></span>
                         </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">PIC Name</label>
-                            <input type="text" name="pic_name" class="form-control">
-                            <span class="text-danger small error-text" id="error_pic_name"></span>
+                        <div class="col-lg-6 mb-3">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="form-label">PIC Name</label>
+                                    <select name="pic_name" class="form-control tag-select" data-placeholder="Select or type" data-phone-field="pic_phone">
+                                        <option value=""></option>
+                                        @foreach($picOptions['names'] as $pic)
+                                            <option value="{{ $pic['name'] }}" data-hint="{{ $pic['phone'] }}">{{ $pic['name'] }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="text-danger small error-text" id="error_pic_name"></span>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">No. HP</label>
+                                    <select name="pic_phone" class="form-control tag-select phone-select" data-placeholder="Select or type" data-name-field="pic_name">
+                                        <option value=""></option>
+                                        @foreach($picOptions['phones'] as $pic)
+                                            <option value="{{ $pic['phone'] }}" data-hint="{{ $pic['name'] }}">{{ $pic['phone'] }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="text-danger small error-text" id="error_pic_phone"></span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">Foto <small class="fw-normal text-muted">· JPG, PNG, WEBP, maks 2 MB</small></label>
                             <input type="file" name="photo" class="form-control" accept="image/jpeg,image/png,image/webp">
                             <span class="text-danger small error-text" id="error_photo"></span>
                         </div>
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">Standard</label>
-                            <select name="iso_standard" class="form-control iso-standard-select">
+                            <select name="iso_standard" class="form-control tag-select" data-placeholder="-- Select or type Standard --">
                                 <option value=""></option>
                                 @foreach($isoOptions as $iso)
                                     <option value="{{ $iso }}">{{ $iso }}</option>
@@ -168,29 +226,29 @@ html.app-skin-dark .file-current{
                             </select>
                             <span class="text-danger small error-text" id="error_iso_standard"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">Dokumen <small class="fw-normal text-muted">· semua jenis file, maks 5 MB</small></label>
                             <input type="file" name="document" class="form-control">
                             <span class="text-danger small error-text" id="error_document"></span>
                         </div>
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">IA</label>
                             <input type="date" name="ia_date" class="form-control">
                             <span class="text-danger small error-text" id="error_ia_date"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">SA1</label>
                             <input type="date" name="sa1_date" class="form-control">
                             <span class="text-danger small error-text" id="error_sa1_date"></span>
                         </div>
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">SA2</label>
                             <input type="date" name="sa2_date" class="form-control">
                             <span class="text-danger small error-text" id="error_sa2_date"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">RC</label>
                             <input type="date" name="rc_date" class="form-control">
                             <span class="text-danger small error-text" id="error_rc_date"></span>
@@ -222,34 +280,77 @@ html.app-skin-dark .file-current{
 
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">Client Name</label>
-                            <input type="text" name="client_name" value="{{ $row->client_name }}" class="form-control">
+                            <select name="client_name" class="form-control tag-select" data-placeholder="-- Select or type Client Name --">
+                                <option value=""></option>
+                                @foreach($clientNames as $name)
+                                    <option value="{{ $name }}" {{ strcasecmp($name, $row->client_name) === 0 ? 'selected' : '' }}>{{ $name }}</option>
+                                @endforeach
+                            </select>
                             <span class="text-danger small error-text" id="error_client_name_{{ $row->id_client }}"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Sales Name</label>
-                            <input type="text" name="sales_name" value="{{ $row->sales_name }}" class="form-control">
-                            <span class="text-danger small error-text" id="error_sales_name_{{ $row->id_client }}"></span>
+                        <div class="col-lg-6 mb-3">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="form-label">Sales Name</label>
+                                    <select name="sales_name" class="form-control tag-select" data-placeholder="Select or type" data-phone-field="sales_phone">
+                                        <option value=""></option>
+                                        @foreach($salesOptions['names'] as $sales)
+                                            <option value="{{ $sales['name'] }}" data-hint="{{ $sales['phone'] }}" {{ strcasecmp($sales['name'], $row->sales_name ?? '') === 0 ? 'selected' : '' }}>{{ $sales['name'] }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="text-danger small error-text" id="error_sales_name_{{ $row->id_client }}"></span>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">No. HP</label>
+                                    <select name="sales_phone" class="form-control tag-select phone-select" data-placeholder="Select or type" data-name-field="sales_name">
+                                        <option value=""></option>
+                                        @foreach($salesOptions['phones'] as $sales)
+                                            <option value="{{ $sales['phone'] }}" data-hint="{{ $sales['name'] }}" {{ $sales['phone'] === $row->sales_phone ? 'selected' : '' }}>{{ $sales['phone'] }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="text-danger small error-text" id="error_sales_phone_{{ $row->id_client }}"></span>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">Scope</label>
                             <input type="text" name="scope" value="{{ $row->scope }}" class="form-control">
                             <span class="text-danger small error-text" id="error_scope_{{ $row->id_client }}"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">Legalitas</label>
                             <input type="text" name="legality" value="{{ $row->legality }}" class="form-control">
                             <span class="text-danger small error-text" id="error_legality_{{ $row->id_client }}"></span>
                         </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">PIC Name</label>
-                            <input type="text" name="pic_name" value="{{ $row->pic_name }}" class="form-control">
-                            <span class="text-danger small error-text" id="error_pic_name_{{ $row->id_client }}"></span>
+                        <div class="col-lg-6 mb-3">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="form-label">PIC Name</label>
+                                    <select name="pic_name" class="form-control tag-select" data-placeholder="Select or type" data-phone-field="pic_phone">
+                                        <option value=""></option>
+                                        @foreach($picOptions['names'] as $pic)
+                                            <option value="{{ $pic['name'] }}" data-hint="{{ $pic['phone'] }}" {{ strcasecmp($pic['name'], $row->pic_name ?? '') === 0 ? 'selected' : '' }}>{{ $pic['name'] }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="text-danger small error-text" id="error_pic_name_{{ $row->id_client }}"></span>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">No. HP</label>
+                                    <select name="pic_phone" class="form-control tag-select phone-select" data-placeholder="Select or type" data-name-field="pic_name">
+                                        <option value=""></option>
+                                        @foreach($picOptions['phones'] as $pic)
+                                            <option value="{{ $pic['phone'] }}" data-hint="{{ $pic['name'] }}" {{ $pic['phone'] === $row->pic_phone ? 'selected' : '' }}>{{ $pic['phone'] }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="text-danger small error-text" id="error_pic_phone_{{ $row->id_client }}"></span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">Foto <small class="fw-normal text-muted">· JPG, PNG, WEBP, maks 2 MB</small></label>
                             <div class="d-flex gap-2">
                                 @if($row->photo_mime)
@@ -262,9 +363,9 @@ html.app-skin-dark .file-current{
                             <span class="text-danger small error-text" id="error_photo_{{ $row->id_client }}"></span>
                         </div>
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">Standard</label>
-                            <select name="iso_standard" class="form-control iso-standard-select">
+                            <select name="iso_standard" class="form-control tag-select" data-placeholder="-- Select or type Standard --">
                                 <option value=""></option>
                                 @php
                                     // Standard tersimpan yang tidak ada di daftar tetap tampil sebagai pilihan
@@ -279,7 +380,7 @@ html.app-skin-dark .file-current{
                             </select>
                             <span class="text-danger small error-text" id="error_iso_standard_{{ $row->id_client }}"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">Dokumen <small class="fw-normal text-muted">· semua jenis file, maks 5 MB</small></label>
                             <div class="d-flex gap-2">
                                 @if($row->document_name)
@@ -293,23 +394,23 @@ html.app-skin-dark .file-current{
                             <span class="text-danger small error-text" id="error_document_{{ $row->id_client }}"></span>
                         </div>
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">IA</label>
                             <input type="date" name="ia_date" value="{{ $row->ia_date }}" class="form-control">
                             <span class="text-danger small error-text" id="error_ia_date_{{ $row->id_client }}"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">SA1</label>
                             <input type="date" name="sa1_date" value="{{ $row->sa1_date }}" class="form-control">
                             <span class="text-danger small error-text" id="error_sa1_date_{{ $row->id_client }}"></span>
                         </div>
 
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">SA2</label>
                             <input type="date" name="sa2_date" value="{{ $row->sa2_date }}" class="form-control">
                             <span class="text-danger small error-text" id="error_sa2_date_{{ $row->id_client }}"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-lg-6 mb-3">
                             <label class="form-label">RC</label>
                             <input type="date" name="rc_date" value="{{ $row->rc_date }}" class="form-control">
                             <span class="text-danger small error-text" id="error_rc_date_{{ $row->id_client }}"></span>
@@ -347,9 +448,11 @@ html.app-skin-dark .file-current{
                 @foreach([
                     'Client Name' => $row->client_name,
                     'Sales Name' => $row->sales_name,
+                    'No. HP Sales' => $row->sales_phone,
                     'Scope' => $row->scope,
                     'Legalitas' => $row->legality,
                     'PIC Name' => $row->pic_name,
+                    'No. HP PIC' => $row->pic_phone,
                     'Standard' => $row->iso_standard,
                     'IA' => $dateText($row->ia_date),
                     'SA1' => $dateText($row->sa1_date),
@@ -410,7 +513,7 @@ $(document).ready(function() {
         pageLength: 10
     });
 
-    // Dropdown Standard selalu menempel tepat di bawah field. Bawaan Select2 (attachBody) menghitung
+    // Dropdown selalu menempel tepat di bawah field. Bawaan Select2 (attachBody) menghitung
     // posisi dengan JS sehingga di dalam modal yang di-scroll bisa meleset atau berbalik ke atas.
     let s2 = $.fn.select2.amd.require;
     let Utils = s2('select2/utils');
@@ -422,26 +525,124 @@ $(document).ready(function() {
         $dropdown.addClass('select2-dropdown--below');
         $container.addClass('select2-container--below');
     };
-    let standardDropdown = Utils.Decorate(
+    let tagDropdown = Utils.Decorate(
         Utils.Decorate(Utils.Decorate(s2('select2/dropdown'), s2('select2/dropdown/search')), s2('select2/dropdown/closeOnSelect')),
         AttachBelowField
     );
 
-    // Dropdown Standard: pilih dari daftar atau ketik Standard baru
-    $('.iso-standard-select').each(function(){
-        $(this).select2({
+    // Nomor HP: angka dengan pemisah spasi / - / . / kurung, boleh diawali +, minimal 6 digit (sama dengan validasi server)
+    const PHONE_PATTERN = /^\+?(?:[\s().-]*\d){6,}[\s().-]*$/;
+
+    // Keterangan di samping pilihan: nomor HP terakhir untuk nama, nama pemilik untuk nomor HP
+    function hintOf(item){
+        return item.element ? ($(item.element).attr('data-hint') || '') : '';
+    }
+
+    // Pilih value tanpa membedakan huruf besar/kecil; value baru ditambahkan sebagai pilihan
+    function setTagValue(select, value){
+        let option = select.find('option').filter(function(){
+            return this.value !== '' && this.value.toLowerCase() === value.toLowerCase();
+        });
+        if (!option.length) {
+            option = $(new Option(value, value));
+            select.append(option);
+        }
+        select.val(option.val()).trigger('change');
+        return option[0];
+    }
+
+    // Client Name, Sales, PIC, No. HP & Standard: pilih dari daftar atau ketik entri baru.
+    // Entri baru ikut tersimpan bersama data client, jadi muncul di daftar pada input berikutnya.
+    $('.tag-select').each(function(){
+        let select = $(this);
+        let isPhone = select.hasClass('phone-select');
+        let picked = false;
+
+        select.select2({
             theme: 'bootstrap-5',
             tags: true,
+            allowClear: true,
             width: '100%',
-            placeholder: '-- Select or type Standard --',
-            dropdownAdapter: standardDropdown
+            dropdownAdapter: tagDropdown,
+            // Cari juga lewat keterangan, mis. ketik nama Sales untuk menemukan nomornya
+            matcher: function(params, item){
+                let term = $.trim(params.term || '').toLowerCase();
+                if (!term || (item.text + ' ' + hintOf(item)).toLowerCase().includes(term)) {
+                    return item;
+                }
+                return null;
+            },
+            templateResult: function(item){
+                let hint = hintOf(item);
+                if (!hint) {
+                    return item.text;
+                }
+                return $('<span>').append(
+                    $('<span class="d-block">').text(item.text),
+                    $('<small class="d-block opacity-75">').text(hint)
+                );
+            },
+            createTag: function(params){
+                let term = $.trim(params.term);
+                if (!term || (isPhone && !PHONE_PATTERN.test(term))) {
+                    return null;
+                }
+                return { id: term, text: term };
+            },
+            // Entri baru di urutan terakhir, sehingga data yang sudah ada yang tersorot lebih dulu
+            insertTag: function(data, tag){
+                data.push(tag);
+            }
         }).on('select2:open', function(){
+            picked = false;
             // Pastikan daftar pilihan terlihat penuh di dalam modal (setelah hasil selesai di-render)
-            let dropdown = $(this).next('.select2-container').find('.select2-dropdown')[0];
+            let dropdown = select.next('.select2-container').find('.select2-dropdown')[0];
             setTimeout(function(){
                 dropdown.scrollIntoView({ block: 'nearest' });
             });
+        }).on('select2:selecting', function(){
+            picked = true;
+        }).on('select2:closing', function(e){
+            let original = e.params.args && e.params.args.originalEvent;
+            if (original && (original.key === 'Escape' || original.which === 27)) {
+                // Esc hanya menutup dropdown & membatalkan ketikan, modal jangan ikut tertutup
+                original.stopPropagation();
+                return;
+            }
+            // Sudah mengetik tapi field ditinggalkan (klik di luar) tanpa memilih: pakai pilihan yang tersorot,
+            // sama seperti menekan Enter, agar ketikan tidak hilang
+            let container = select.next('.select2-container');
+            let term = $.trim(container.find('.select2-search__field').val());
+            let highlighted = container.find('.select2-results__option--highlighted')[0];
+            let data = highlighted && Utils.GetData(highlighted, 'data');
+            if (picked || !term || !data || data.id === undefined) {
+                return;
+            }
+            let option = setTagValue(select, String(data.id));
+            select.trigger({ type: 'select2:select', params: { data: { id: option.value, element: option } } });
         });
+    });
+
+    // Nama Sales/PIC dipilih: isi nomor HP terakhir orang itu. Jika orang itu belum punya nomor,
+    // kosongkan nomor yang tercatat milik orang lain (nomor baru yang belum ada pemiliknya dibiarkan).
+    $('.tag-select[data-phone-field]').on('select2:select', function(e){
+        let phone = $(this).closest('form').find('select[name="' + $(this).data('phone-field') + '"]');
+        let known = hintOf(e.params.data);
+        let owner = phone.find('option:selected').attr('data-hint');
+        if (known) {
+            setTagValue(phone, known);
+        } else if (owner && owner.toLowerCase() !== String(e.params.data.id).toLowerCase()) {
+            phone.val(null).trigger('change');
+        }
+    });
+
+    // Nomor HP dipilih saat nama masih kosong: isi nama pemilik nomor itu
+    $('.tag-select[data-name-field]').on('select2:select', function(e){
+        let name = $(this).closest('form').find('select[name="' + $(this).data('name-field') + '"]');
+        let owner = hintOf(e.params.data);
+        if (owner && !name.val()) {
+            setTagValue(name, owner);
+        }
     });
 
     // Tombol Clear: hapus pesan error dan sinkronkan tampilan Select2 setelah form di-reset
@@ -449,7 +650,7 @@ $(document).ready(function() {
         let form = $(this);
         form.find('.error-text').text('');
         setTimeout(function(){
-            form.find('.iso-standard-select').trigger('change');
+            form.find('.tag-select').trigger('change');
         });
     });
 
