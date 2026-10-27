@@ -19,7 +19,7 @@ html.app-skin-dark .detail-row:hover{
 <div class="main-content">
     <div class="card stretch stretch-full">
         <div class="d-flex justify-content-between align-items-center p-3">
-            <h5 class="card-title mb-0">Certification</h5>
+            <h5 class="card-title page-title mb-0">Certification</h5>
             <button class="btn btn-primary px-4 py-2" data-bs-toggle="modal" data-bs-target="#createCertificationModal">
                 <i class="feather-plus me-1"></i> Create
             </button>

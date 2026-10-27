@@ -33,7 +33,7 @@
 <div class="main-content">
     <div class="card stretch stretch-full">
         <div class="d-flex justify-content-between align-items-center p-3">
-            <h5 class="card-title mb-0">Standard</h5>
+            <h5 class="card-title page-title mb-0">Standard</h5>
             <button class="btn btn-primary px-4 py-2" data-bs-toggle="modal" data-bs-target="#createTypeCertificateModal">
                 <i class="bi bi-clipboard2-plus me-2"></i> Create
             </button>

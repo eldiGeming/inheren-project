@@ -42,6 +42,11 @@
             color: #b1b4c0;
         }
 
+        /* Judul card di halaman tabel master (Company, Standard, Certification, Data Client): 30% lebih besar dari 16px bawaan */
+        .card-title.page-title {
+            font-size: 20.8px;
+        }
+
         /* Theme membalik warna logo di dark mode (untuk logo bawaan template); logo Inheren sudah terbaca di latar gelap */
         html.app-skin-dark .nxl-navigation .m-header .logo-lg {
             filter: none;

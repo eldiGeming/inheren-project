@@ -42,7 +42,7 @@ select + .select2-container--bootstrap-5.select2-container--open{
 <div class="main-content">
     <div class="card stretch stretch-full">
         <div class="d-flex justify-content-between align-items-center p-3">
-            <h5 class="card-title mb-0">Data Client</h5>
+            <h5 class="card-title page-title mb-0">Data Client</h5>
             <button class="btn btn-primary px-4 py-2" data-bs-toggle="modal" data-bs-target="#createClientModal">
                 <i class="feather-plus me-1"></i> Create
             </button>
