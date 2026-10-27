@@ -27,9 +27,10 @@ html.app-skin-dark .file-current{
     background-color: #1b2436;
 }
 
-/* Tombol hapus pilihan Select2 4.1 berupa <button>; buang bingkai bawaan browser */
-.select2-container--bootstrap-5 .select2-selection__clear{
-    border: 0;
+/* Tema memberi tiap field Select2 z-index 1, sehingga field di bawahnya (mis. Standard)
+   menutupi dropdown yang sedang terbuka. Field yang terbuka dinaikkan di atas field lain. */
+select + .select2-container--bootstrap-5.select2-container--open{
+    z-index: 2;
 }
 </style>
 
@@ -561,7 +562,6 @@ $(document).ready(function() {
         select.select2({
             theme: 'bootstrap-5',
             tags: true,
-            allowClear: true,
             width: '100%',
             dropdownAdapter: tagDropdown,
             // Cari juga lewat keterangan, mis. ketik nama Sales untuk menemukan nomornya
