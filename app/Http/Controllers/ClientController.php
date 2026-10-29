@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\ClientAttachment;
 use App\Models\Company;
 use App\Models\TypeCertificate;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\Mime\MimeTypes;
 
 class ClientController extends Controller
 {
@@ -43,26 +46,32 @@ class ClientController extends Controller
             ->sort(SORT_NATURAL | SORT_FLAG_CASE)
             ->values();
 
+        // Pilihan dropdown CB: CB yang pernah diinput
+        $cbOptions = Client::where('is_deleted', 0)->whereNotNull('cb')->pluck('cb')
+            ->unique(fn ($name) => strtolower($name))
+            ->sort(SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
+
         $salesOptions = $this->contactOptions('sales_name', 'sales_phone');
         $picOptions = $this->contactOptions('pic_name', 'pic_phone');
 
-        // Ambil semua client tanpa kolom BLOB agar list tetap ringan
+        // Ambil semua client tanpa kolom BLOB agar list tetap ringan (lampiran juga hanya nama file-nya)
         $allClient = Client::select(array_values(array_diff(Schema::getColumnListing('clients'), ['photo', 'document'])))
+            ->with(['attachments' => fn ($query) => $query->select('id_client_attachment', 'id_client', 'type', 'file_name')])
             ->where('is_deleted', 0)
             ->get();
 
-        return view('client.index', compact('allClient', 'isoOptions', 'clientNames', 'salesOptions', 'picOptions'));
+        return view('client.index', compact('allClient', 'isoOptions', 'clientNames', 'cbOptions', 'salesOptions', 'picOptions'));
     }
 
     public function store(Request $request)
     {
         $request->validate($this->rules(), [], $this->attributes());
+        $this->ensureFitsDatabase($request);
 
         $client = new Client();
         $this->fillClient($client, $request);
-        if ($oversize = $this->saveWithFiles($client)) {
-            return $oversize;
-        }
+        $this->saveClient($client, $request);
 
         return response()->json([
             'message' => 'Client created successfully!',
@@ -75,11 +84,10 @@ class ClientController extends Controller
         $client = Client::findOrFail($id);
 
         $request->validate($this->rules(), [], $this->attributes());
+        $this->ensureFitsDatabase($request);
 
         $this->fillClient($client, $request);
-        if ($oversize = $this->saveWithFiles($client)) {
-            return $oversize;
-        }
+        $this->saveClient($client, $request);
 
         return response()->json([
             'message' => 'Client updated successfully!',
@@ -96,11 +104,22 @@ class ClientController extends Controller
         return response()->json(['message' => 'Client has been deleted.']);
     }
 
-    // Tampilkan foto (BLOB) client
-    public function photo($id)
+    // Tampilkan foto (BLOB) client, atau unduh dengan ?download=1
+    public function photo(Request $request, $id)
     {
-        $client = Client::select('photo', 'photo_mime')->findOrFail($id);
+        $client = Client::select('client_name', 'photo', 'photo_mime')->findOrFail($id);
         abort_if(! $client->photo, 404);
+
+        if ($request->boolean('download')) {
+            $extension = MimeTypes::getDefault()->getExtensions($client->photo_mime)[0] ?? 'jpg';
+
+            return response()->streamDownload(function () use ($client) {
+                echo $client->photo;
+            }, 'foto-'.(Str::slug($client->client_name) ?: $id).'.'.$extension, [
+                'Content-Type' => $client->photo_mime,
+                'X-Content-Type-Options' => 'nosniff',
+            ]);
+        }
 
         return response($client->photo)
             ->header('Content-Type', $client->photo_mime)
@@ -117,6 +136,19 @@ class ClientController extends Controller
             echo $client->document;
         }, $client->document_name, [
             'Content-Type' => $client->document_mime,
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
+    // Download lampiran jadwal audit (BLOB), mis. type = ia_certificate
+    public function attachment($id, $type)
+    {
+        $attachment = ClientAttachment::where('id_client', $id)->where('type', $type)->firstOrFail();
+
+        return response()->streamDownload(function () use ($attachment) {
+            echo $attachment->file;
+        }, $attachment->file_name, [
+            'Content-Type' => $attachment->file_mime,
             'X-Content-Type-Options' => 'nosniff',
         ]);
     }
@@ -157,11 +189,15 @@ class ClientController extends Controller
         // Angka dengan pemisah spasi / - / . / kurung, boleh diawali +, minimal 6 digit
         $phone = ['nullable', 'string', 'max:30', 'regex:/^\+?(?:[\s().-]*\d){6,}[\s().-]*$/'];
 
-        return [
+        // Lampiran Sertifikat & Report: semua jenis file, maks 5 MB (sama dengan Dokumen)
+        $attachments = array_fill_keys(array_keys(ClientAttachment::types()), 'nullable|file|max:5120');
+
+        return $attachments + [
             'client_name' => 'required|string|max:255',
             'sales_name' => 'nullable|string|max:255',
             'sales_phone' => $phone,
             'scope' => 'nullable|string',
+            'cb' => 'nullable|string|max:255',
             'legality' => 'nullable|string|max:255',
             'pic_name' => 'nullable|string|max:255',
             'pic_phone' => $phone,
@@ -178,8 +214,9 @@ class ClientController extends Controller
     // Nama field di pesan error, sesuai label form
     private function attributes(): array
     {
-        return [
+        return ClientAttachment::types() + [
             'client_name' => 'client name',
+            'cb' => 'CB',
             'sales_phone' => 'no. HP sales',
             'iso_standard' => 'standard',
             'pic_name' => 'PIC name',
@@ -193,33 +230,63 @@ class ClientController extends Controller
         ];
     }
 
-    // Simpan client; jika foto + dokumen melebihi max_allowed_packet MySQL, kembalikan error 422
-    private function saveWithFiles(Client $client): ?JsonResponse
+    // Tolak (422) file yang melebihi max_allowed_packet MySQL sebelum ada yang disimpan. Foto + dokumen
+    // tersimpan dalam satu query baris clients, tiap lampiran dalam query sendiri.
+    private function ensureFitsDatabase(Request $request): void
     {
-        try {
+        if (! in_array(DB::getDriverName(), ['mysql', 'mariadb'])) {
+            return;
+        }
+
+        // Sisakan ruang untuk query dan kolom teks lain (Scope maks 64 KB)
+        $limit = DB::selectOne('SELECT @@max_allowed_packet AS size')->size - 128 * 1024;
+        $limitText = 'maks. '.round($limit / 1048576, 1).' MB';
+        $size = fn ($field) => $request->hasFile($field) ? $request->file($field)->getSize() : 0;
+
+        $errors = [];
+        if ($size('photo') + $size('document') > $limit) {
+            $message = "Ukuran foto + dokumen melebihi batas server database ($limitText). Gunakan file yang lebih kecil.";
+            $errors = array_fill_keys(array_filter(['photo', 'document'], fn ($field) => $size($field)), $message);
+        }
+        foreach (array_keys(ClientAttachment::types()) as $type) {
+            if ($size($type) > $limit) {
+                $errors[$type] = "Ukuran file melebihi batas server database ($limitText). Gunakan file yang lebih kecil.";
+            }
+        }
+
+        if ($errors) {
+            throw ValidationException::withMessages($errors);
+        }
+    }
+
+    // Simpan client beserta lampiran yang di-upload; lampiran lama pada jenis yang sama diganti
+    private function saveClient(Client $client, Request $request): void
+    {
+        DB::transaction(function () use ($client, $request) {
             $client->save();
 
-            return null;
-        } catch (QueryException $e) {
-            // 1153: Got a packet bigger than 'max_allowed_packet' bytes
-            if (($e->errorInfo[1] ?? null) != 1153) {
-                throw $e;
+            foreach (array_keys(ClientAttachment::types()) as $type) {
+                if (! $request->hasFile($type)) {
+                    continue;
+                }
+
+                $file = $request->file($type);
+                // Lampiran lama diambil tanpa kolom BLOB-nya
+                $attachment = ClientAttachment::select('id_client_attachment', 'id_client', 'type')
+                    ->firstOrNew(['id_client' => $client->id_client, 'type' => $type]);
+                $attachment->file = $file->get();
+                $attachment->file_name = $file->getClientOriginalName();
+                $attachment->file_mime = $file->getMimeType() ?: 'application/octet-stream';
+                $attachment->save();
             }
-
-            $message = 'Ukuran foto + dokumen melebihi batas server database. Gunakan file yang lebih kecil.';
-
-            return response()->json([
-                'message' => $message,
-                'errors' => ['photo' => [$message], 'document' => [$message]],
-            ], 422);
-        }
+        });
     }
 
     // Isi field Data Client; foto & dokumen hanya diganti jika ada upload baru
     private function fillClient(Client $client, Request $request): void
     {
         $client->fill($request->only([
-            'client_name', 'sales_name', 'scope', 'legality', 'pic_name', 'iso_standard',
+            'client_name', 'sales_name', 'scope', 'cb', 'legality', 'pic_name', 'iso_standard',
             'ia_date', 'sa1_date', 'sa2_date', 'rc_date',
         ]));
 

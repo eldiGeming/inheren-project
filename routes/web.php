@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/client/{id}', [ClientController::class, 'destroy'])->name('client.destroy');
     Route::get('/client/photo/{id}', [ClientController::class, 'photo'])->name('client.photo');
     Route::get('/client/document/{id}', [ClientController::class, 'document'])->name('client.document');
+    Route::get('/client/attachment/{id}/{type}', [ClientController::class, 'attachment'])->name('client.attachment');
 
     Route::get('/profile', [CompanyProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [CompanyProfileController::class, 'update'])->name('profile.update');

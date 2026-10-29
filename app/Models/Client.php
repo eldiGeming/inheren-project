@@ -15,6 +15,7 @@ class Client extends Model
         'sales_name',
         'sales_phone',
         'scope',
+        'cb',
         'legality',
         'pic_name',
         'pic_phone',
@@ -35,4 +36,10 @@ class Client extends Model
         'photo',
         'document'
     ];
+
+    // Lampiran Sertifikat & Report jadwal audit (IA, SA1, SA2, RC)
+    public function attachments()
+    {
+        return $this->hasMany(ClientAttachment::class, 'id_client', 'id_client');
+    }
 }
