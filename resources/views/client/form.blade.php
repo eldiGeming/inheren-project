@@ -3,6 +3,7 @@
     $suffix = $row ? '_'.$row->id_client : '';
     $uid = 'client'.($row ? $row->id_client : 'New');
     $files = $row ? $row->attachments->keyBy('type') : collect();
+    $legality = $files->get(\App\Models\ClientAttachment::LEGALITY);
     $selected = fn ($option, $value) => strcasecmp($option, $value ?? '') === 0 ? 'selected' : '';
 
     // Standard tersimpan yang tidak ada di daftar tetap tampil sebagai pilihan
@@ -104,12 +105,24 @@
             </div>
         </div>
 
-        {{-- Kolom tengah: legalitas, foto, dokumen --}}
+        {{-- Kolom tengah: legalitas, foto, dokumen, note --}}
         <div class="col-lg-6 col-xl-4 client-col-main">
             <div class="client-field">
                 <label class="form-label" for="{{ $uid }}_legality">Legalitas</label>
                 <div>
-                    <input type="text" id="{{ $uid }}_legality" name="legality" value="{{ $row?->legality }}" class="form-control">
+                    <div class="client-file">
+                        @if($legality)
+                            <a href="{{ route('client.attachment', [$row->id_client, \App\Models\ClientAttachment::LEGALITY]) }}" class="file-current btn btn-light border flex-shrink-0 p-0"
+                                title="Unduh legalitas saat ini: {{ $legality->file_name }}" aria-label="Unduh legalitas saat ini: {{ $legality->file_name }}">
+                                <i class="bi bi-download"></i>
+                            </a>
+                        @endif
+                        <div class="client-file-input">
+                            <input type="file" id="{{ $uid }}_legality" name="legality" class="form-control">
+                            <i class="bi bi-folder2-open" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                    <div class="client-hint">Semua jenis file, maks 5 MB</div>
                     <span class="text-danger small error-text" id="error_legality{{ $suffix }}"></span>
                 </div>
             </div>
@@ -150,6 +163,14 @@
                     </div>
                     <div class="client-hint">Semua jenis file, maks 5 MB</div>
                     <span class="text-danger small error-text" id="error_document{{ $suffix }}"></span>
+                </div>
+            </div>
+
+            <div class="client-field">
+                <label class="form-label" for="{{ $uid }}_note">Note</label>
+                <div>
+                    <textarea id="{{ $uid }}_note" name="note" rows="4" class="form-control" placeholder="Catatan (opsional)">{{ $row?->note }}</textarea>
+                    <span class="text-danger small error-text" id="error_note{{ $suffix }}"></span>
                 </div>
             </div>
 

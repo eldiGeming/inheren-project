@@ -92,6 +92,15 @@ html.app-skin-dark .client-form .form-control,
     padding: 0 16px;
     font-size: 13px;
 }
+/* Note: kotak teks beberapa baris, sudut membulat mengikuti gaya pill */
+.client-form textarea.form-control{
+    height: auto;
+    min-height: 96px;
+    padding: 10px 16px;
+    line-height: 1.5;
+    border-radius: 18px;
+    resize: vertical;
+}
 .client-form .form-control:focus,
 .client-form .select2-container--focus .select2-selection,
 .client-form .select2-container--open .select2-selection{
@@ -239,11 +248,15 @@ html.app-skin-dark .client-form .btn-client:active{
             </button>
         </div>
 
+        <x-list-toolbar table="clientList" :export="route('client.export')"
+            :dates="[6 => 'IA']"
+            :sorts="['6:desc' => 'IA terbaru', '6:asc' => 'IA terlama']" />
+
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-borderless align-middle mb-0"
+                <table class="table table-list table-hover table-borderless align-middle mb-0"
                        id="clientList"
-                       style="min-width: 1000px;">
+                       style="min-width: 900px;">
 
                     <thead class="text-center">
                         <tr>
@@ -254,13 +267,14 @@ html.app-skin-dark .client-form .btn-client:active{
                             <th>Sales Name</th>
                             <th>PIC Name</th>
                             <th>IA</th>
+                            <th>Note</th>
                             <th>Action</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         @foreach($allClient as $key => $row)
-                        <tr id="clientRow{{ $row->id_client }}">
+                        <tr id="clientRow{{ $row->id_client }}" data-id="{{ $row->id_client }}">
 
                             <td class="text-center">{{ $key + 1 }}</td>
 
@@ -284,7 +298,15 @@ html.app-skin-dark .client-form .btn-client:active{
                                 @endif
                             </td>
 
-                            <td class="text-center">{{ $dateText($row->ia_date) ?: '-' }}</td>
+                            <td class="text-center" data-order="{{ $row->ia_date }}">{{ $dateText($row->ia_date) ?: '-' }}</td>
+
+                            <td class="note-cell">
+                                @if($row->note)
+                                    <span title="{{ $row->note }}">{{ $row->note }}</span>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
 
                             <td>
                                 <div class="d-flex align-items-center gap-1 flex-nowrap">
@@ -380,7 +402,6 @@ html.app-skin-dark .client-form .btn-client:active{
                     'No. HP PIC' => $row->pic_phone,
                     'Sales Name' => $row->sales_name,
                     'No. HP Sales' => $row->sales_phone,
-                    'Legalitas' => $row->legality,
                     'Standard' => $row->iso_standard,
                 ] as $label => $value)
                 <div class="row mb-3 py-2 border-bottom detail-row">
@@ -389,8 +410,26 @@ html.app-skin-dark .client-form .btn-client:active{
                 </div>
                 @endforeach
 
-                {{-- Jadwal audit beserta Lampiran Sertifikat & Report yang bisa diunduh --}}
                 @php($files = $row->attachments->keyBy('type'))
+                @php($legality = $files->get(\App\Models\ClientAttachment::LEGALITY))
+                <div class="row mb-3 py-2 border-bottom detail-row">
+                    <div class="col-md-4 fw-bold">Legalitas</div>
+                    <div class="col-md-8">
+                        @if($legality)
+                            <a href="{{ route('client.attachment', [$row->id_client, \App\Models\ClientAttachment::LEGALITY]) }}">
+                                <i class="bi bi-download me-1"></i>{{ $legality->file_name }}
+                            </a>
+                        @else
+                            <span class="text-muted">-</span>
+                        @endif
+                    </div>
+                </div>
+                <div class="row mb-3 py-2 border-bottom detail-row">
+                    <div class="col-md-4 fw-bold">Note</div>
+                    <div class="col-md-8" style="white-space: pre-line;">{{ $row->note ?: '-' }}</div>
+                </div>
+
+                {{-- Jadwal audit beserta Lampiran Sertifikat & Report yang bisa diunduh --}}
                 @foreach(\App\Models\ClientAttachment::STAGES as $stage => $stageLabel)
                 <div class="row mb-3 py-2 border-bottom detail-row">
                     <div class="col-md-4 fw-bold">{{ $stageLabel }}</div>
@@ -463,9 +502,13 @@ $(document).ready(function() {
         }
     });
 
+    // Default urut tanggal IA terbaru; kolom No & Action tidak bisa diurutkan
     let table = $('#clientList').DataTable({
-        pageLength: 10
+        pageLength: 10,
+        order: [[6, 'desc']],
+        columnDefs: [{ targets: [0, -1], orderable: false, searchable: false }]
     });
+    setupListToolbar(table);
 
     // Dropdown selalu menempel tepat di bawah field. Bawaan Select2 (attachBody) menghitung
     // posisi dengan JS sehingga di dalam modal yang di-scroll bisa meleset atau berbalik ke atas.
@@ -732,12 +775,8 @@ $(document).ready(function() {
                     data: { _method: 'DELETE' },
                     success: function(res){
 
+                        // Nomor urut diperbarui otomatis saat tabel di-draw ulang
                         table.row(row).remove().draw(false);
-
-                        // Re-number
-                        table.rows().every(function(index){
-                            this.cell(index,0).data(index+1);
-                        });
 
                         Swal.fire({
                             icon: 'success',

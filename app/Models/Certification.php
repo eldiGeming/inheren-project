@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Certification extends Model
 {
+    // Status sertifikat, lihat getStatusAttribute()
+    public const STATUSES = ['Active', 'Suspended', 'Withdrawn'];
+
     protected $table = 'certifications';
 
     protected $primaryKey = 'id_certification';
@@ -16,6 +19,7 @@ class Certification extends Model
         'number_certificate',
         'issues_date',
         'expired_date',
+        'note',
         'barcode_certificate',
         'reminder_sent_at',
         'is_deleted',
@@ -50,9 +54,21 @@ class Certification extends Model
 
     public function getExpiredDateFormattedAttribute()
     {
-        return $this->expired_date 
-            ? Carbon::parse($this->expired_date)->format('d-m-Y') 
+        return $this->expired_date
+            ? Carbon::parse($this->expired_date)->format('d-m-Y')
             : null;
+    }
+
+    // Active sebelum tanggal expired, Suspended sejak tanggal expired sampai 2 bulan setelahnya, lalu Withdrawn
+    public function getStatusAttribute(): string
+    {
+        $expired = Carbon::parse($this->expired_date)->startOfDay();
+
+        if (today()->lt($expired)) {
+            return 'Active';
+        }
+
+        return today()->lt($expired->addMonthsNoOverflow(2)) ? 'Suspended' : 'Withdrawn';
     }
 
 }

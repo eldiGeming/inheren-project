@@ -5,6 +5,7 @@ use Carbon\Carbon;
 use App\Models\Certification;
 use App\Models\Company;
 use App\Models\TypeCertificate;
+use App\Support\RecapExport;
 use Illuminate\Http\Request;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -54,6 +55,7 @@ class CertificationController extends Controller
             'id_company' => 'required|exists:companies,id_company',
             'id_type_certificate' => 'required|exists:type_certificates,id_type_certificate',
             'issues_date' => 'required|date',
+            'note' => 'nullable|string|max:5000',
         ]);
 
         $issuesDate = Carbon::parse($request->issues_date);
@@ -92,6 +94,7 @@ class CertificationController extends Controller
             'number_certificate' => $number,
             'issues_date' => $issuesDate,
             'expired_date' => $expiredDate,
+            'note' => $request->note,
             'barcode_certificate' => $number, 
         ]);
 
@@ -114,6 +117,7 @@ class CertificationController extends Controller
             'id_company' => 'required|exists:companies,id_company',
             'id_type_certificate' => 'required|exists:type_certificates,id_type_certificate',
             'issues_date' => 'required|date',
+            'note' => 'nullable|string|max:5000',
         ]);
 
         $issuesDate = Carbon::parse($request->issues_date);
@@ -123,6 +127,7 @@ class CertificationController extends Controller
         $certification->id_type_certificate = $request->id_type_certificate;
         $certification->issues_date = $issuesDate;
         $certification->expired_date = $expiredDate;
+        $certification->note = $request->note;
         $certification->barcode_certificate = $certification->number_certificate;
 
         $certification->save();
@@ -143,6 +148,47 @@ class CertificationController extends Controller
         $company->save();
 
         return response()->json(['message' => 'Certification has been deleted.']);
+    }
+
+    // Download rekap Excel/PDF berisi baris yang tampil di tabel (mengikuti filter & urutan di layar)
+    public function export(Request $request)
+    {
+        $request->validate([
+            'format' => 'required|in:xlsx,pdf',
+            'ids' => 'nullable|string',
+            'filter' => 'nullable|string|max:500',
+        ]);
+
+        $ids = RecapExport::ids($request->ids);
+        $position = array_flip($ids);
+        $rows = Certification::with(['company', 'type'])
+            ->where('is_deleted', 0)
+            ->whereIn('id_certification', $ids)
+            ->get()
+            ->sortBy(fn ($cert) => $position[$cert->id_certification])
+            ->values()
+            ->map(fn ($cert, $index) => [
+                $index + 1,
+                $cert->company->name_company,
+                $cert->type->type_certificate,
+                $cert->number_certificate,
+                Carbon::parse($cert->issues_date),
+                Carbon::parse($cert->expired_date),
+                $cert->status,
+                $cert->note,
+            ])
+            ->all();
+
+        return RecapExport::download($request->format, 'Rekap Certification', $request->filter, [
+            'No' => 4,
+            'Company Name' => 20,
+            'Type Certificate' => 14,
+            'Number Certificate' => 12,
+            'Issues Date' => 9,
+            'Expired Date' => 9,
+            'Status' => 8,
+            'Note' => 24,
+        ], $rows);
     }
 
     public function show($id)

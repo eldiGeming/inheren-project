@@ -14,6 +14,40 @@
 html.app-skin-dark .detail-row:hover{
     background: #1b2436;
 }
+
+/* Badge status sertifikat: Active (hijau), Suspended (oranye), Withdrawn (merah) */
+.cert-status{
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 50rem;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.cert-status-active{
+    background-color: #dcfce7;
+    color: #166534;
+}
+.cert-status-suspended{
+    background-color: #fef3c7;
+    color: #92400e;
+}
+.cert-status-withdrawn{
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+html.app-skin-dark .cert-status-active{
+    background-color: rgba(34, 197, 94, 0.16);
+    color: #86efac;
+}
+html.app-skin-dark .cert-status-suspended{
+    background-color: rgba(245, 158, 11, 0.16);
+    color: #fcd34d;
+}
+html.app-skin-dark .cert-status-withdrawn{
+    background-color: rgba(239, 68, 68, 0.16);
+    color: #fca5a5;
+}
 </style>
 
 <div class="main-content">
@@ -25,13 +59,18 @@ html.app-skin-dark .detail-row:hover{
             </button>
         </div>
 
+        <x-list-toolbar table="certificationList" :export="route('certification.export')"
+            :dates="[4 => 'Issues Date', 5 => 'Expired Date']"
+            :sorts="['4:desc' => 'Issues Date terbaru', '4:asc' => 'Issues Date terlama', '5:asc' => 'Expired Date terdekat', '5:desc' => 'Expired Date terjauh']"
+            :status="['column' => 6, 'options' => \App\Models\Certification::STATUSES]" />
+
         <div class="card-body p-0">
    <div class="card-body p-0">
     <div class="table-responsive">
-        <table class="table table-hover table-borderless align-middle mb-0" 
-               id="certificationList" 
+        <table class="table table-list table-hover table-borderless align-middle mb-0"
+               id="certificationList"
                style="min-width: 900px;">
-            
+
             <thead class="text-center">
                 <tr>
                     <th>No</th>
@@ -40,13 +79,15 @@ html.app-skin-dark .detail-row:hover{
                     <th>Number Certificate</th>
                     <th>Issues Date</th>
                     <th>Expired Date</th>
+                    <th>Status</th>
+                    <th>Note</th>
                     <th>Action</th>
                 </tr>
             </thead>
 
             <tbody>
                 @foreach($allCertification as $key => $row)
-                <tr id="certificationRow{{ $row->id_certification }}">
+                <tr id="certificationRow{{ $row->id_certification }}" data-id="{{ $row->id_certification }}">
 
                     <td class="text-center">{{ $key + 1 }}</td>
 
@@ -56,9 +97,21 @@ html.app-skin-dark .detail-row:hover{
 
                     <td>{{ $row->number_certificate }}</td>
 
-                    <td class="text-center">{{ $row->issues_date_formatted }}</td>
+                    <td class="text-center" data-order="{{ $row->issues_date }}">{{ $row->issues_date_formatted }}</td>
 
-                    <td class="text-center">{{ $row->expired_date_formatted }}</td>
+                    <td class="text-center" data-order="{{ $row->expired_date }}">{{ $row->expired_date_formatted }}</td>
+
+                    <td class="text-center" data-search="{{ $row->status }}">
+                        <span class="cert-status cert-status-{{ strtolower($row->status) }}">{{ $row->status }}</span>
+                    </td>
+
+                    <td class="note-cell">
+                        @if($row->note)
+                            <span title="{{ $row->note }}">{{ $row->note }}</span>
+                        @else
+                            <span class="text-muted">-</span>
+                        @endif
+                    </td>
 
                     <td>
                         <div class="d-flex align-items-center gap-1 flex-nowrap">
@@ -150,6 +203,12 @@ html.app-skin-dark .detail-row:hover{
                                 <input type="date" name="issues_date" class="form-control">
                                 <span class="text-danger small error-text" id="error_issues_date"></span>
                             </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Note</label>
+                                <textarea name="note" rows="3" class="form-control" placeholder="Catatan (opsional)"></textarea>
+                                <span class="text-danger small error-text" id="error_note"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -212,6 +271,13 @@ html.app-skin-dark .detail-row:hover{
                                 <label class="form-label">Issues Date</label>
                                 <input type="date" name="issues_date" value="{{ $row->issues_date }}" class="form-control">
                                 <span class="text-danger small error-text" id="error_issues_date_{{ $row->id_certification }}"></span>
+                            </div>
+
+                            {{-- Note --}}
+                            <div class="mb-3">
+                                <label class="form-label">Note</label>
+                                <textarea name="note" rows="3" class="form-control" placeholder="Catatan (opsional)">{{ $row->note }}</textarea>
+                                <span class="text-danger small error-text" id="error_note_{{ $row->id_certification }}"></span>
                             </div>
                         </div>
                     </div>
@@ -290,6 +356,16 @@ html.app-skin-dark .detail-row:hover{
                     <div class="col-md-8">{{ $row->expired_date_formatted }}</div>
                 </div>
                 <div class="row mb-3 py-2 border-bottom detail-row">
+                    <div class="col-md-4 fw-bold">Status</div>
+                    <div class="col-md-8">
+                        <span class="cert-status cert-status-{{ strtolower($row->status) }}">{{ $row->status }}</span>
+                    </div>
+                </div>
+                <div class="row mb-3 py-2 border-bottom detail-row">
+                    <div class="col-md-4 fw-bold">Note</div>
+                    <div class="col-md-8" style="white-space: pre-line;">{{ $row->note ?: '-' }}</div>
+                </div>
+                <div class="row mb-3 py-2 border-bottom detail-row">
                     
                     <div class="col-md-4 fw-bold">QR Code</div>
                     <div class="col-md-8">
@@ -318,9 +394,13 @@ $(document).ready(function() {
         }
     });
 
+    // Default urut Issues Date terbaru; kolom No & Action tidak bisa diurutkan
     let table = $('#certificationList').DataTable({
-        pageLength: 10
+        pageLength: 10,
+        order: [[4, 'desc']],
+        columnDefs: [{ targets: [0, -1], orderable: false, searchable: false }]
     });
+    setupListToolbar(table);
 
     // ================= CREATE =================
     $('#createCertificationForm').submit(function(e){
@@ -443,12 +523,8 @@ $(document).ready(function() {
                     data: { _method: 'DELETE' },
                     success: function(res){
 
+                        // Nomor urut diperbarui otomatis saat tabel di-draw ulang
                         table.row(row).remove().draw(false);
-
-                        // Re-number
-                        table.rows().every(function(index){
-                            this.cell(index,0).data(index+1);
-                        });
 
                         Swal.fire({
                             icon: 'success',

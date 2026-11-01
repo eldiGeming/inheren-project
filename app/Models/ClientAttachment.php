@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class ClientAttachment extends Model
 {
+    // File Legalitas Data Client (satu per client), disimpan di tabel ini bersama lampiran jadwal audit
+    public const LEGALITY = 'legality';
+
     // Jadwal audit Data Client, masing-masing punya Lampiran Sertifikat & Lampiran Report
     public const STAGES = [
         'ia' => 'IA',
@@ -36,10 +39,10 @@ class ClientAttachment extends Model
         'file'
     ];
 
-    // Nama field upload / nilai kolom type, mis. ['ia_certificate' => 'IA Lampiran Sertifikat', ...]
+    // Nama field upload / nilai kolom type: Legalitas + lampiran jadwal audit, mis. ['ia_certificate' => 'IA Lampiran Sertifikat', ...]
     public static function types(): array
     {
-        $types = [];
+        $types = [self::LEGALITY => 'Legalitas'];
         foreach (self::STAGES as $stage => $stageLabel) {
             foreach (self::KINDS as $kind => $kindLabel) {
                 $types[$stage.'_'.$kind] = $stageLabel.' '.$kindLabel;

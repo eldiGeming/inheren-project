@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/certification', [CertificationController::class, 'index'])->name('certification.index');
     Route::post('/certification', [CertificationController::class, 'store'])->name('certification.store');
+    Route::post('/certification/export', [CertificationController::class, 'export'])->name('certification.export');
     Route::patch('/certification/{id}', [CertificationController::class, 'update'])->name('certification.update');
     Route::delete('/certification/{id}', [CertificationController::class, 'destroy'])->name('certification.destroy');
     Route::get('/certification/pdf/{id}', [CertificationController::class, 'generatePdf'])->name('certification.generatePdf');
@@ -50,6 +51,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/client', [ClientController::class, 'index'])->name('client.index');
     Route::post('/client', [ClientController::class, 'store'])->name('client.store');
+    Route::post('/client/export', [ClientController::class, 'export'])->name('client.export');
     Route::patch('/client/{id}', [ClientController::class, 'update'])->name('client.update');
     Route::delete('/client/{id}', [ClientController::class, 'destroy'])->name('client.destroy');
     Route::get('/client/photo/{id}', [ClientController::class, 'photo'])->name('client.photo');

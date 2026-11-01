@@ -6,6 +6,8 @@ use App\Models\Client;
 use App\Models\ClientAttachment;
 use App\Models\Company;
 use App\Models\TypeCertificate;
+use App\Support\RecapExport;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -95,6 +97,63 @@ class ClientController extends Controller
         ]);
     }
 
+    // Download rekap Excel/PDF berisi baris yang tampil di tabel (mengikuti filter & urutan di layar)
+    public function export(Request $request)
+    {
+        $request->validate([
+            'format' => 'required|in:xlsx,pdf',
+            'ids' => 'nullable|string',
+            'filter' => 'nullable|string|max:500',
+        ]);
+
+        $ids = RecapExport::ids($request->ids);
+        $position = array_flip($ids);
+        $date = fn ($value) => $value ? Carbon::parse($value) : null;
+        $rows = Client::select(array_values(array_diff(Schema::getColumnListing('clients'), ['photo', 'document'])))
+            ->with(['attachments' => fn ($query) => $query->select('id_client', 'type', 'file_name')->where('type', ClientAttachment::LEGALITY)])
+            ->where('is_deleted', 0)
+            ->whereIn('id_client', $ids)
+            ->get()
+            ->sortBy(fn ($client) => $position[$client->id_client])
+            ->values()
+            ->map(fn ($client, $index) => [
+                $index + 1,
+                $client->client_name,
+                $client->iso_standard,
+                $client->scope,
+                $client->cb,
+                $client->pic_name,
+                $client->pic_phone,
+                $client->sales_name,
+                $client->sales_phone,
+                $date($client->ia_date),
+                $date($client->sa1_date),
+                $date($client->sa2_date),
+                $date($client->rc_date),
+                $client->attachments->first()?->file_name,
+                $client->note,
+            ])
+            ->all();
+
+        return RecapExport::download($request->format, 'Rekap Data Client', $request->filter, [
+            'No' => 3,
+            'Client Name' => 9,
+            'Standard' => 6,
+            'Scope' => 8,
+            'CB' => 5,
+            'PIC Name' => 7,
+            'PIC No. HP' => 7,
+            'Sales Name' => 7,
+            'Sales No. HP' => 7,
+            'IA' => 6,
+            'SA1' => 6,
+            'SA2' => 6,
+            'RC' => 6,
+            'Legalitas' => 6,
+            'Note' => 11,
+        ], $rows);
+    }
+
     public function destroy($id)
     {
         $client = Client::findOrFail($id);
@@ -140,7 +199,7 @@ class ClientController extends Controller
         ]);
     }
 
-    // Download lampiran jadwal audit (BLOB), mis. type = ia_certificate
+    // Download file Legalitas / lampiran jadwal audit (BLOB), mis. type = legality, ia_certificate
     public function attachment($id, $type)
     {
         $attachment = ClientAttachment::where('id_client', $id)->where('type', $type)->firstOrFail();
@@ -189,7 +248,7 @@ class ClientController extends Controller
         // Angka dengan pemisah spasi / - / . / kurung, boleh diawali +, minimal 6 digit
         $phone = ['nullable', 'string', 'max:30', 'regex:/^\+?(?:[\s().-]*\d){6,}[\s().-]*$/'];
 
-        // Lampiran Sertifikat & Report: semua jenis file, maks 5 MB (sama dengan Dokumen)
+        // Legalitas, Lampiran Sertifikat & Report: semua jenis file, maks 5 MB (sama dengan Dokumen)
         $attachments = array_fill_keys(array_keys(ClientAttachment::types()), 'nullable|file|max:5120');
 
         return $attachments + [
@@ -198,7 +257,7 @@ class ClientController extends Controller
             'sales_phone' => $phone,
             'scope' => 'nullable|string',
             'cb' => 'nullable|string|max:255',
-            'legality' => 'nullable|string|max:255',
+            'note' => 'nullable|string|max:5000',
             'pic_name' => 'nullable|string|max:255',
             'pic_phone' => $phone,
             'iso_standard' => 'nullable|string|max:255',
@@ -259,7 +318,7 @@ class ClientController extends Controller
         }
     }
 
-    // Simpan client beserta lampiran yang di-upload; lampiran lama pada jenis yang sama diganti
+    // Simpan client beserta Legalitas & lampiran yang di-upload; file lama pada jenis yang sama diganti
     private function saveClient(Client $client, Request $request): void
     {
         DB::transaction(function () use ($client, $request) {
@@ -286,8 +345,8 @@ class ClientController extends Controller
     private function fillClient(Client $client, Request $request): void
     {
         $client->fill($request->only([
-            'client_name', 'sales_name', 'scope', 'cb', 'legality', 'pic_name', 'iso_standard',
-            'ia_date', 'sa1_date', 'sa2_date', 'rc_date',
+            'client_name', 'sales_name', 'scope', 'cb', 'pic_name', 'iso_standard',
+            'ia_date', 'sa1_date', 'sa2_date', 'rc_date', 'note',
         ]));
 
         // Nomor HP disimpan tanpa spasi/tanda baca agar nomor yang sama tidak muncul dua kali di dropdown

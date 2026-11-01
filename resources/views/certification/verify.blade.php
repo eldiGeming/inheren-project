@@ -102,6 +102,12 @@
             box-shadow: 0 2px 8px rgba(15, 81, 50, 0.15);
         }
 
+        .status-suspended {
+            background-color: #fff3cd;
+            color: #664d03;
+            box-shadow: 0 2px 8px rgba(102, 77, 3, 0.15);
+        }
+
         .status-expired {
             background-color: #f8d7da;
             color: #842029;
@@ -382,12 +388,13 @@
     {{-- <img src="{{ asset('assets/images/logo-abbr.png') }}" alt="" class="bg-watermark"> --}}
 
     @php
-        $isExpired = \Carbon\Carbon::parse($certification->expired_date)->isPast();
+        // Active / Suspended / Withdrawn, aturan sama dengan kolom Status di menu Certification
+        $status = $certification->status;
     @endphp
 
     <div class="content-wrapper">
 
-        <div class="status-icon-wrapper {{ $isExpired ? 'expired' : 'active' }}">
+        <div class="status-icon-wrapper {{ strtolower($status) }}">
             <div class="main-icon">
                 <img src="{{ asset('storage/' . $certification->type->logo_certificate) }}" 
                     alt="{{ $certification->type->type_certificate }}" 
@@ -396,13 +403,17 @@
         </div>
 
         <div class="d-flex justify-content-center mb-3">
-            @if($isExpired)
-                <span class="status-badge status-expired">
-                    <i class="bi bi-x-octagon-fill"></i> EXPIRED
-                </span>
-            @else
+            @if($status === 'Active')
                 <span class="status-badge status-active">
                     <i class="bi bi-patch-check-fill"></i> ACTIVE
+                </span>
+            @elseif($status === 'Suspended')
+                <span class="status-badge status-suspended">
+                    <i class="bi bi-pause-circle-fill"></i> SUSPENDED
+                </span>
+            @else
+                <span class="status-badge status-expired">
+                    <i class="bi bi-x-octagon-fill"></i> WITHDRAWN
                 </span>
             @endif
         </div>
