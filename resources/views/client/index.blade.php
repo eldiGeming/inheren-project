@@ -597,27 +597,12 @@ html.app-skin-dark .client-current-file{
     }
 }
 
-/* Header: bersih dengan ikon & garis aksen (biru = tambah, kuning = edit) */
+/* Header: bersih dengan ikon; Create & Edit dibedakan ikon & judul, warna tetap aksen form */
 .client-form-header{
-    position: relative;
-    overflow: hidden; /* garis aksen ikut sudut membulat modal (rounded-4) */
-    border-radius: 1rem 1rem 0 0;
+    border-radius: 1rem 1rem 0 0; /* ikut sudut membulat modal (rounded-4) */
     padding: 18px 20px 16px;
     border-bottom: 1px solid var(--client-panel-line);
     background: var(--client-panel);
-}
-.client-form-header::before{
-    content: "";
-    position: absolute;
-    inset: 0 0 auto;
-    height: 4px;
-    border-radius: inherit;
-}
-.client-form-header.is-create::before{
-    background: #3454d1;
-}
-.client-form-header.is-edit::before{
-    background: #f59e0b;
 }
 .client-form-heading{
     display: flex;
@@ -634,13 +619,9 @@ html.app-skin-dark .client-current-file{
     border-radius: 12px;
     font-size: 18px;
 }
-.is-create .client-form-badge{
-    background: rgba(52, 84, 209, 0.12);
-    color: #3454d1;
-}
-.is-edit .client-form-badge{
-    background: rgba(245, 158, 11, 0.16);
-    color: #b45309;
+.client-form-badge{
+    background: rgba(138, 79, 208, 0.12);
+    color: var(--client-accent);
 }
 .client-form-header .modal-title{
     font-size: 16px;
@@ -654,13 +635,8 @@ html.app-skin-dark .client-current-file{
     font-size: 12.5px;
     color: var(--client-muted);
 }
-html.app-skin-dark .is-create .client-form-badge{
-    background: rgba(99, 130, 245, 0.18);
-    color: #a9bbff;
-}
-html.app-skin-dark .is-edit .client-form-badge{
-    background: rgba(245, 158, 11, 0.16);
-    color: #fbbf24;
+html.app-skin-dark .client-form-badge{
+    background: rgba(167, 125, 224, 0.16);
 }
 html.app-skin-dark .client-form-header .btn-close{
     filter: invert(1) grayscale(100%) brightness(200%);
@@ -678,7 +654,22 @@ html.app-skin-dark .client-form-header .btn-close{
     box-shadow: 0 -6px 16px rgba(16, 24, 40, 0.06);
 }
 
-/* Tombol CLEAR (merah muda) & SAVE (hijau) seperti mockup, versi lebih tegas dengan ikon */
+/* Tombol: satu warna aksen untuk seluruh form. Update/Save = solid ungu aksen (sama dengan field),
+   Clear = tombol netral sekunder. Tanpa glow berwarna. */
+.client-form{
+    --client-btn: #6a2bb5;
+    --client-btn-hover: #58239a;
+    --client-neutral-line: #8a94a6; /* kontras garis 3:1 terhadap footer */
+    --client-neutral-text: #344054;
+    --client-neutral-hover: #f2f4f7;
+}
+html.app-skin-dark .client-form{
+    --client-btn: #7c4dcc;
+    --client-btn-hover: #8d62d6;
+    --client-neutral-line: #5d6b85;
+    --client-neutral-text: #d0d5dd;
+    --client-neutral-hover: #1b2436;
+}
 .client-form .btn-client{
     display: inline-flex;
     align-items: center;
@@ -692,7 +683,8 @@ html.app-skin-dark .client-form-header .btn-close{
     font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.02em;
-    transition: background-color 0.15s, box-shadow 0.15s, transform 0.15s;
+    box-shadow: none;
+    transition: background-color 0.15s, border-color 0.15s, transform 0.15s;
 }
 .client-form .btn-client .bi{
     font-size: 15px;
@@ -700,42 +692,37 @@ html.app-skin-dark .client-form-header .btn-close{
 .client-form .btn-client:active{
     transform: translateY(1px);
 }
+.client-form .btn-client:focus-visible{
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem var(--client-ring);
+}
 .client-form .btn-client-clear{
-    border-color: #fecdd3;
-    background-color: #fff1f2;
+    border-color: var(--client-neutral-line);
+    background-color: transparent;
 }
 .client-form .btn-client-clear:hover,
 .client-form .btn-client-clear:focus-visible{
-    background-color: #ffe4e6;
+    background-color: var(--client-neutral-hover);
 }
 .client-form .btn-client-save{
-    background-color: #16a34a;
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+    border-color: var(--client-btn);
+    background-color: var(--client-btn);
 }
 .client-form .btn-client-save:hover,
 .client-form .btn-client-save:focus-visible{
-    background-color: #15803d;
+    border-color: var(--client-btn-hover);
+    background-color: var(--client-btn-hover);
 }
-html.app-skin-dark .client-form .btn-client-clear{
-    border-color: rgba(244, 63, 94, 0.35);
-    background-color: rgba(244, 63, 94, 0.12);
-}
-html.app-skin-dark .client-form .btn-client-clear:hover,
-html.app-skin-dark .client-form .btn-client-clear:focus-visible{
-    background-color: rgba(244, 63, 94, 0.2);
-}
-/* Tema memaksa warna teks tombol (putih saat fokus/klik & di dark mode); tetapkan warna sesuai latar tombol */
+/* Tema memaksa warna teks tombol (putih saat fokus/klik & di dark mode); tetapkan sesuai latar tombol */
 .client-form .btn-client-clear,
 .client-form .btn-client-clear:hover,
 .client-form .btn-client-clear:focus,
-.client-form .btn-client-clear:active{
-    color: #be123c !important;
-}
+.client-form .btn-client-clear:active,
 html.app-skin-dark .client-form .btn-client-clear,
 html.app-skin-dark .client-form .btn-client-clear:hover,
 html.app-skin-dark .client-form .btn-client-clear:focus,
 html.app-skin-dark .client-form .btn-client-clear:active{
-    color: #fda4af !important;
+    color: var(--client-neutral-text) !important;
 }
 .client-form .btn-client-save,
 .client-form .btn-client-save:hover,

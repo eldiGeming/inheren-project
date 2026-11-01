@@ -6,8 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Certification extends Model
 {
-    // Status sertifikat, lihat getStatusAttribute()
-    public const STATUSES = ['Active', 'Suspended', 'Withdrawn'];
+    // Status sertifikat (lihat getStatusAttribute) => [warna latar, warna teks] di export Excel/PDF.
+    // Badge di halaman memakai warna yang sama lewat class .cert-status-* (certification/index).
+    public const STATUSES = [
+        'Active' => ['DCFCE7', '166534'],
+        'Suspended' => ['FEF3C7', '92400E'],
+        'Withdrawn' => ['FEE2E2', '991B1B'],
+    ];
 
     protected $table = 'certifications';
 

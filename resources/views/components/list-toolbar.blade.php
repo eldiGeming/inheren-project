@@ -21,10 +21,11 @@
         <span class="lt-label">s/d</span>
         <input type="date" class="form-control form-control-sm lt-date-to" aria-label="Sampai tanggal">
         @if($status)
+            {{-- $status['badge'] (opsional): prefix class badge, pilihan tampil sebagai badge berwarna mis. "cert-status cert-status-active" --}}
             <select class="form-select form-select-sm lt-status" data-column="{{ $status['column'] }}" aria-label="Filter status">
                 <option value="">Semua status</option>
                 @foreach($status['options'] as $option)
-                    <option value="{{ $option }}">{{ $option }}</option>
+                    <option value="{{ $option }}" @isset($status['badge']) data-badge="{{ $status['badge'].strtolower($option) }}" @endisset>{{ $option }}</option>
                 @endforeach
             </select>
         @endif
@@ -87,6 +88,18 @@
     padding: 0 14px;
     font-size: 13px;
 }
+/* Dropdown status berbadge (Select2) setinggi kontrol toolbar lain */
+.list-toolbar .select2-container{
+    width: 160px !important; /* theme memaksa Select2 100% lebar */
+}
+.list-toolbar .select2-container--bootstrap-5 .select2-selection--single{
+    display: flex;
+    align-items: center;
+    height: 34px;
+    min-height: 34px;
+    padding: 0 2rem 0 10px;
+    font-size: 13px;
+}
 .list-toolbar .lt-reset{
     width: 34px;
     padding: 0;
@@ -147,9 +160,24 @@ window.setupListToolbar = function (table) {
     bar.on('click', '.lt-reset', function () {
         from.val('');
         to.val('');
-        status.val('');
+        status.val('').trigger('change.select2');
         applyFilter();
     });
+
+    // Status dengan warna identitas: pilihan & nilai terpilih tampil sebagai badge (Select2)
+    if (status.find('option[data-badge]').length) {
+        let badge = function (item) {
+            let badgeClass = item.element && item.element.getAttribute('data-badge');
+            return badgeClass ? $('<span>').addClass(badgeClass).text(item.text) : item.text;
+        };
+        status.select2({
+            theme: 'bootstrap-5',
+            width: '150px',
+            minimumResultsForSearch: Infinity,
+            templateResult: badge,
+            templateSelection: badge,
+        });
+    }
 
     // Urutkan: pilihan ikut berubah bila urutan diganti lewat klik judul kolom
     sort.on('change', function () {

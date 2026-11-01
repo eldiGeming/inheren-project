@@ -188,7 +188,7 @@ class CertificationController extends Controller
             'Expired Date' => 9,
             'Status' => 8,
             'Note' => 24,
-        ], $rows);
+        ], $rows, ['column' => 'Status', 'colors' => Certification::STATUSES]);
     }
 
     public function show($id)

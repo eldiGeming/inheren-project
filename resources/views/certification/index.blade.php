@@ -62,7 +62,7 @@ html.app-skin-dark .cert-status-withdrawn{
         <x-list-toolbar table="certificationList" :export="route('certification.export')"
             :dates="[4 => 'Issues Date', 5 => 'Expired Date']"
             :sorts="['4:desc' => 'Issues Date terbaru', '4:asc' => 'Issues Date terlama', '5:asc' => 'Expired Date terdekat', '5:desc' => 'Expired Date terjauh']"
-            :status="['column' => 6, 'options' => \App\Models\Certification::STATUSES]" />
+            :status="['column' => 6, 'options' => array_keys(\App\Models\Certification::STATUSES), 'badge' => 'cert-status cert-status-']" />
 
         <div class="card-body p-0">
    <div class="card-body p-0">
