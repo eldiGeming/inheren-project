@@ -246,6 +246,56 @@ html.app-skin-dark .client-preview-loading{
     color: #98a2b3;
 }
 
+/* Modal edit: panel preview menutupi kolom kiri & tengah form (layar >= 1200px) atau seluruh form (layar lebih kecil)
+   dan menempel di layar selama form di-scroll. Field tidak bergeser; kolom kanan (lampiran audit) tetap bisa diklik. */
+.client-form .modal-body{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+}
+.client-form .modal-body > *{
+    grid-area: 1 / 1;
+}
+.client-preview-drawer{
+    position: sticky;
+    top: 1rem;
+    z-index: 2; /* di bawah footer sticky (z-index 3) */
+    align-self: start;
+    height: min(calc(100vh - 2rem - 81px), 100%); /* 81px = tinggi footer */
+    border: 1px solid var(--client-panel-line);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 16px 40px rgba(45, 27, 92, 0.2);
+    animation: client-drawer-in 0.2s ease-out;
+}
+@media (min-width: 1200px){
+    .client-preview-drawer{
+        width: calc((100% + 1.5rem) * 2 / 3 - 1.5rem); /* kolom kiri + tengah, gutter row gx-4 = 1.5rem */
+    }
+}
+@keyframes client-drawer-in{
+    from{
+        opacity: 0;
+        transform: translateX(-12px);
+    }
+}
+@media (prefers-reduced-motion: reduce){
+    .client-preview-drawer{
+        animation: none;
+    }
+}
+.client-form .client-preview-icon{
+    color: var(--client-accent);
+}
+.client-form .client-preview-action:hover,
+.client-form .client-preview-action:focus-visible{
+    border-color: var(--client-line-strong);
+    color: var(--client-accent);
+}
+html.app-skin-dark .client-preview-drawer{
+    border-color: var(--client-panel-line);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
 /* Thumbnail foto & tombol unduh file lama di modal edit, setinggi input file */
 .file-current{
     width: 40px;
@@ -442,8 +492,8 @@ html.app-skin-dark .client-form input[type="date"]::-webkit-calendar-picker-indi
     font-size: 11px;
     color: #6b7280;
 }
-/* File yang sudah tersimpan di bawah input modal edit: nama panjang dipotong (lengkap di tooltip),
-   ikon unduh tetap sebaris */
+/* File yang sudah tersimpan di bawah input modal edit: chip [mata] nama [unduh], nama panjang dipotong
+   (lengkap di tooltip). Ikon mata = radio preview, sama seperti di modal detail. */
 .client-current{
     display: flex;
     align-items: center;
@@ -457,27 +507,72 @@ html.app-skin-dark .client-form input[type="date"]::-webkit-calendar-picker-indi
     flex-shrink: 0;
     color: #6b7280;
 }
-.client-current-file{
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
-}
-.client-current-file > a:first-child{
-    min-width: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-.client-current-file > .file-download{
-    flex-shrink: 0;
-}
-/* Keterangan "(unduh untuk membuka)" cukup di modal detail; di sini tooltip & ikon unduh sudah menjelaskan */
-.client-current-file > .text-muted{
-    display: none;
-}
 html.app-skin-dark .client-current-icon{
     color: #9ca3af;
+}
+.client-current .file-item{
+    gap: 2px;
+    padding: 2px;
+    border-radius: 50rem;
+    background: rgba(138, 79, 208, 0.08);
+    font-size: 12px;
+}
+html.app-skin-dark .client-current .file-item{
+    background: rgba(167, 125, 224, 0.14);
+}
+.client-current .file-item-open{
+    gap: 8px;
+    padding-right: 4px;
+}
+.client-current .file-item-eye,
+.client-current .file-item-download{
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 13px;
+}
+/* Di dalam form, warna aktif ikon mata mengikuti aksen ungu form (modal detail tetap biru tema) */
+.client-form .file-item-open:hover .file-item-eye,
+html.app-skin-dark .client-form .file-item-open:hover .file-item-eye{
+    border-color: var(--client-line-strong);
+    color: var(--client-accent);
+}
+.client-form .file-item-open:has(.file-preview-radio:checked) .file-item-eye,
+html.app-skin-dark .client-form .file-item-open:has(.file-preview-radio:checked) .file-item-eye{
+    border-color: var(--client-btn);
+    background: var(--client-btn);
+    color: #fff;
+}
+.client-form .file-item-open:has(.file-preview-radio:checked) .file-item-name,
+html.app-skin-dark .client-form .file-item-open:has(.file-preview-radio:checked) .file-item-name{
+    color: var(--client-accent);
+}
+.client-form .file-item-open:has(.file-preview-radio:focus-visible) .file-item-eye{
+    outline-color: var(--client-line-strong);
+}
+.client-form .file-item-download:hover,
+.client-form .file-item-download:focus-visible,
+html.app-skin-dark .client-form .file-item-download:hover,
+html.app-skin-dark .client-form .file-item-download:focus-visible{
+    background: rgba(138, 79, 208, 0.16);
+    color: var(--client-accent);
+}
+/* Thumbnail foto di modal edit = ikon mata foto */
+.file-current-open{
+    margin: 0;
+    border-radius: 0.375rem;
+    cursor: pointer;
+}
+.file-current-open:hover .file-current{
+    border-color: var(--client-line-strong) !important;
+}
+.file-current-open:has(.file-preview-radio:checked) .file-current{
+    border-color: var(--client-btn) !important;
+    box-shadow: 0 0 0 2px var(--client-btn);
+}
+.file-current-open:has(.file-preview-radio:focus-visible){
+    outline: 2px solid var(--client-line-strong);
+    outline-offset: 2px;
 }
 .client-note{
     margin-top: 0.75rem;
@@ -565,16 +660,6 @@ html.app-skin-dark .client-file-input .form-control{
 }
 .client-file-input .form-control:hover{
     background-color: rgba(138, 79, 208, 0.04) !important;
-}
-
-/* File yang tersimpan tampil sebagai chip */
-.client-current-file{
-    padding: 2px 10px;
-    border-radius: 50rem;
-    background: rgba(138, 79, 208, 0.08);
-}
-html.app-skin-dark .client-current-file{
-    background: rgba(167, 125, 224, 0.14);
 }
 
 /* Catatan info dengan ikon */
@@ -1002,20 +1087,7 @@ html.app-skin-dark .client-form .btn-client-save:active{
                 </div>
             </div>
 
-            {{-- Panel preview: diisi JS dari ikon mata yang dipilih --}}
-            <aside class="client-preview" aria-label="Preview file" hidden>
-                <div class="client-preview-head">
-                    <i class="bi bi-eye client-preview-icon" aria-hidden="true"></i>
-                    <span class="client-preview-name"></span>
-                    <a href="#" class="client-preview-action client-preview-download" title="Unduh file ini" aria-label="Unduh file ini">
-                        <i class="bi bi-download"></i>
-                    </a>
-                    <button type="button" class="client-preview-action client-preview-close" title="Tutup preview" aria-label="Tutup preview">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
-                </div>
-                <div class="client-preview-stage"></div>
-            </aside>
+            @include('client.preview-panel')
             </div>
 
             <!-- Footer -->
@@ -1176,13 +1248,19 @@ $(document).ready(function() {
         }
     });
 
-    // ================= PREVIEW FILE DI MODAL DETAIL =================
-    // Ikon mata bersifat radio: file yang dipilih tampil di panel kanan dan modal melebar, tanpa membuka tab baru
-    function closePreview(modal){
+    // ================= PREVIEW FILE DI MODAL DETAIL & EDIT =================
+    // Ikon mata bersifat radio: file yang dipilih tampil di panel preview modal itu, tanpa membuka tab baru.
+    // Modal detail melebar ke kanan; di modal edit panel menutupi kolom kiri & tengah form.
+    // restoreFocus: fokus kembali ke ikon mata file tadi (ditutup lewat tombol X / Esc)
+    function closePreview(modal, restoreFocus){
+        let current = modal.find('.file-preview-radio:checked');
         modal.find('.file-preview-radio').prop('checked', false);
         modal.find('.client-preview-stage').empty();
         modal.find('.client-preview').prop('hidden', true);
-        modal.find('.client-detail-dialog').removeClass('is-previewing');
+        modal.find('.modal-dialog').removeClass('is-previewing');
+        if (restoreFocus) {
+            current.trigger('focus');
+        }
     }
 
     $(document).on('change', '.file-preview-radio', function(){
@@ -1205,15 +1283,33 @@ $(document).ready(function() {
         panel.find('.client-preview-stage').empty().append(media, loading);
         media.attr('src', file.src);
         panel.prop('hidden', false);
-        modal.find('.client-detail-dialog').addClass('is-previewing');
+        modal.find('.modal-dialog').addClass('is-previewing');
+
+        // Modal edit: geser form agar panel tampil utuh di atas footer yang menempel di bawah layar
+        if (panel.hasClass('client-preview-drawer')) {
+            let overflow = panel[0].getBoundingClientRect().bottom - modal.find('.modal-footer')[0].getBoundingClientRect().top + 16;
+            if (overflow > 0) {
+                modal[0].scrollBy({ top: overflow, behavior: 'smooth' });
+            }
+        }
     });
 
     $(document).on('click', '.client-preview-close', function(){
-        closePreview($(this).closest('.modal'));
+        closePreview($(this).closest('.modal'), true);
     });
 
+    // Esc menutup preview lebih dulu (modal tetap terbuka); Esc berikutnya baru menutup modal.
+    // Capture di document agar jalan sebelum handler Esc milik modal Bootstrap.
+    document.addEventListener('keydown', function(e){
+        let panel = $('.modal.show .client-preview:not([hidden])');
+        if (e.key === 'Escape' && panel.length && !$('.select2-container--open').length) {
+            e.stopPropagation();
+            closePreview(panel.closest('.modal'), true);
+        }
+    }, true);
+
     // Modal ditutup: preview & pilihan ikon mata direset
-    $('.client-detail-modal').on('hidden.bs.modal', function(){
+    $('.modal').has('.client-preview').on('hidden.bs.modal', function(){
         closePreview($(this));
     });
 

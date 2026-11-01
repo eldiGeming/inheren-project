@@ -2,6 +2,7 @@
 @php
     $suffix = $row ? '_'.$row->id_client : '';
     $uid = 'client'.($row ? $row->id_client : 'New');
+    $group = $uid.'Preview'; // grup radio ikon mata file tersimpan (client.file-preview)
     $files = $row ? $row->attachments->keyBy('type') : collect();
     $legality = $files->get(\App\Models\ClientAttachment::LEGALITY);
     $selected = fn ($option, $value) => strcasecmp($option, $value ?? '') === 0 ? 'selected' : '';
@@ -136,9 +137,13 @@
                     <div>
                         <div class="client-file">
                             @if($row?->photo_mime)
-                                <a href="{{ route('client.photo', $row->id_client) }}" target="_blank" class="flex-shrink-0" title="Lihat foto saat ini">
+                                {{-- Thumbnail sekaligus ikon mata foto: klik untuk preview di panel modal --}}
+                                <label class="file-current-open flex-shrink-0" title="Preview foto saat ini">
+                                    <input type="radio" class="file-preview-radio visually-hidden" form="" name="{{ $group }}"
+                                        data-src="{{ route('client.photo', $row->id_client) }}" data-kind="image" data-name="Foto {{ $row->client_name }}"
+                                        data-download="{{ route('client.photo', $row->id_client) }}?download=1">
                                     <img src="{{ route('client.photo', $row->id_client) }}" class="file-current rounded border" loading="lazy" alt="Foto saat ini">
-                                </a>
+                                </label>
                             @endif
                             <div class="client-file-input">
                                 <input type="file" id="{{ $uid }}_photo" name="photo" class="form-control" accept="image/jpeg,image/png,image/webp">
@@ -251,6 +256,10 @@
         </div>
 
     </div>
+
+    @if($row)
+        @include('client.preview-panel', ['class' => 'client-preview-drawer'])
+    @endif
 </div>
 
 <div class="modal-footer">

@@ -100,6 +100,13 @@
     padding: 0 2rem 0 10px;
     font-size: 13px;
 }
+/* Dark mode: latar & teks sama dengan dropdown biasa di sebelahnya */
+html.app-skin-dark .list-toolbar .select2-container--bootstrap-5 .select2-selection{
+    background-color: transparent;
+}
+html.app-skin-dark .list-toolbar .select2-container--bootstrap-5 .select2-selection__rendered{
+    color: #fff;
+}
 .list-toolbar .lt-reset{
     width: 34px;
     padding: 0;
