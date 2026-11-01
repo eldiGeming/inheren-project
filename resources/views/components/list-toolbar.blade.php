@@ -1,9 +1,10 @@
 {{-- Filter rentang tanggal (+ status), urutan, dan download rekap Excel/PDF untuk tabel DataTables.
      $dates = [index kolom => label], $sorts = ['kolom:arah' => label], $status = ['column' => index, 'options' => [...]].
-     Halaman memanggil setupListToolbar(table) setelah DataTable dibuat; sel tanggal perlu data-order (Y-m-d), baris perlu data-id. --}}
+     Halaman memanggil setupListToolbar(table) setelah DataTable dibuat; sel tanggal perlu data-order (Y-m-d), baris perlu data-id.
+     Toolbar disembunyikan sampai dipindah ke bawah baris Show entries / Search milik DataTables. --}}
 @props(['table', 'export', 'dates', 'sorts', 'status' => null])
 
-<div class="list-toolbar" data-table="{{ $table }}" data-export="{{ $export }}">
+<div class="list-toolbar" data-table="{{ $table }}" data-export="{{ $export }}" hidden>
     <div class="list-toolbar-group">
         <span class="lt-label">Tanggal</span>
         @if(count($dates) > 1)
@@ -56,7 +57,8 @@
     justify-content: space-between;
     align-items: center;
     gap: 0.75rem 1.5rem;
-    padding: 0 1rem 1rem;
+    /* Sejajar dengan isi baris Show entries / Search DataTables (padding 25px) */
+    padding: 0 25px 20px;
 }
 .list-toolbar-group{
     display: flex;
@@ -108,6 +110,10 @@ window.setupListToolbar = function (table) {
     let to = bar.find('.lt-date-to');
     let status = bar.find('.lt-status');
     let sort = bar.find('.lt-sort');
+
+    // Search di atas, filter/urutan/download di bawahnya
+    $(table.table().container()).find('.dataTables_filter').closest('.row').after(bar);
+    bar.prop('hidden', false);
 
     // Nomor urut mengikuti urutan & filter yang sedang tampil
     function renumber() {

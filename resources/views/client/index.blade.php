@@ -178,6 +178,43 @@ html.app-skin-dark .client-form input[type="date"]::-webkit-calendar-picker-indi
     font-size: 11px;
     color: #6b7280;
 }
+/* File yang sudah tersimpan di bawah input modal edit: nama panjang dipotong (lengkap di tooltip),
+   ikon unduh tetap sebaris */
+.client-current{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    padding-left: 16px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+.client-current-label{
+    flex-shrink: 0;
+    color: #6b7280;
+}
+.client-current-file{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+.client-current-file > a:first-child{
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.client-current-file > .file-download{
+    flex-shrink: 0;
+}
+/* Keterangan "(unduh untuk membuka)" cukup di modal detail; di sini tooltip & ikon unduh sudah menjelaskan */
+.client-current-file > .text-muted{
+    display: none;
+}
+html.app-skin-dark .client-current-label{
+    color: #9ca3af;
+}
 .client-note{
     margin-top: 0.75rem;
     padding: 0.625rem 0.875rem;
@@ -418,6 +455,7 @@ html.app-skin-dark .client-form .btn-client:active{
                         @if($legality)
                             @include('client.file-link', [
                                 'url' => route('client.attachment', [$row->id_client, \App\Models\ClientAttachment::LEGALITY]),
+                                'view' => route('client.view', [$row->id_client, \App\Models\ClientAttachment::LEGALITY]),
                                 'name' => $legality->file_name, 'mime' => $legality->file_mime,
                             ])
                         @else
@@ -443,6 +481,7 @@ html.app-skin-dark .client-form .btn-client:active{
                                 @if($file)
                                     @include('client.file-link', [
                                         'url' => route('client.attachment', [$row->id_client, $stage.'_'.$kind]),
+                                        'view' => route('client.view', [$row->id_client, $stage.'_'.$kind]),
                                         'name' => $file->file_name, 'mime' => $file->file_mime,
                                     ])
                                 @else
@@ -477,6 +516,7 @@ html.app-skin-dark .client-form .btn-client:active{
                         @if($row->document_name)
                             @include('client.file-link', [
                                 'url' => route('client.document', $row->id_client),
+                                'view' => route('client.view', [$row->id_client, 'document']),
                                 'name' => $row->document_name, 'mime' => $row->document_mime,
                             ])
                         @else

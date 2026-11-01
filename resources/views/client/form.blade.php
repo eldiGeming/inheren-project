@@ -110,18 +110,17 @@
             <div class="client-field">
                 <label class="form-label" for="{{ $uid }}_legality">Legalitas</label>
                 <div>
-                    <div class="client-file">
-                        @if($legality)
-                            @include('client.current-file', [
-                                'url' => route('client.attachment', [$row->id_client, \App\Models\ClientAttachment::LEGALITY]),
-                                'name' => $legality->file_name, 'mime' => $legality->file_mime, 'label' => 'legalitas',
-                            ])
-                        @endif
-                        <div class="client-file-input">
-                            <input type="file" id="{{ $uid }}_legality" name="legality" class="form-control">
-                            <i class="bi bi-folder2-open" aria-hidden="true"></i>
-                        </div>
+                    <div class="client-file-input">
+                        <input type="file" id="{{ $uid }}_legality" name="legality" class="form-control">
+                        <i class="bi bi-folder2-open" aria-hidden="true"></i>
                     </div>
+                    @if($legality)
+                        @include('client.current-file', [
+                            'url' => route('client.attachment', [$row->id_client, \App\Models\ClientAttachment::LEGALITY]),
+                            'view' => route('client.view', [$row->id_client, \App\Models\ClientAttachment::LEGALITY]),
+                            'name' => $legality->file_name, 'mime' => $legality->file_mime,
+                        ])
+                    @endif
                     <div class="client-hint">Semua jenis file, maks 5 MB</div>
                     <span class="text-danger small error-text" id="error_legality{{ $suffix }}"></span>
                 </div>
@@ -149,18 +148,17 @@
             <div class="client-field">
                 <label class="form-label" for="{{ $uid }}_document">Dokumen</label>
                 <div>
-                    <div class="client-file">
-                        @if($row?->document_name)
-                            @include('client.current-file', [
-                                'url' => route('client.document', $row->id_client),
-                                'name' => $row->document_name, 'mime' => $row->document_mime, 'label' => 'dokumen',
-                            ])
-                        @endif
-                        <div class="client-file-input">
-                            <input type="file" id="{{ $uid }}_document" name="document" class="form-control">
-                            <i class="bi bi-folder2-open" aria-hidden="true"></i>
-                        </div>
+                    <div class="client-file-input">
+                        <input type="file" id="{{ $uid }}_document" name="document" class="form-control">
+                        <i class="bi bi-folder2-open" aria-hidden="true"></i>
                     </div>
+                    @if($row?->document_name)
+                        @include('client.current-file', [
+                            'url' => route('client.document', $row->id_client),
+                            'view' => route('client.view', [$row->id_client, 'document']),
+                            'name' => $row->document_name, 'mime' => $row->document_mime,
+                        ])
+                    @endif
                     <div class="client-hint">Semua jenis file, maks 5 MB</div>
                     <span class="text-danger small error-text" id="error_document{{ $suffix }}"></span>
                 </div>
@@ -220,18 +218,17 @@
                     <div class="client-field client-field-sub">
                         <label class="form-label" for="{{ $uid }}_{{ $type }}">{{ $kindLabel }}</label>
                         <div>
-                            <div class="client-file">
-                                @if($file)
-                                    @include('client.current-file', [
-                                        'url' => route('client.attachment', [$row->id_client, $type]),
-                                        'name' => $file->file_name, 'mime' => $file->file_mime, 'label' => $stageLabel.' '.$kindLabel,
-                                    ])
-                                @endif
-                                <div class="client-file-input">
-                                    <input type="file" id="{{ $uid }}_{{ $type }}" name="{{ $type }}" class="form-control" aria-label="{{ $stageLabel }} {{ $kindLabel }}">
-                                    <i class="bi bi-folder2-open" aria-hidden="true"></i>
-                                </div>
+                            <div class="client-file-input">
+                                <input type="file" id="{{ $uid }}_{{ $type }}" name="{{ $type }}" class="form-control" aria-label="{{ $stageLabel }} {{ $kindLabel }}">
+                                <i class="bi bi-folder2-open" aria-hidden="true"></i>
                             </div>
+                            @if($file)
+                                @include('client.current-file', [
+                                    'url' => route('client.attachment', [$row->id_client, $type]),
+                                    'view' => route('client.view', [$row->id_client, $type]),
+                                    'name' => $file->file_name, 'mime' => $file->file_mime,
+                                ])
+                            @endif
                             <span class="text-danger small error-text" id="error_{{ $type }}{{ $suffix }}"></span>
                         </div>
                     </div>

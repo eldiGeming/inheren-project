@@ -192,6 +192,43 @@ class ClientController extends Controller
         return $this->fileResponse($request, $attachment->file, $attachment->file_name, $attachment->file_mime);
     }
 
+    // Buka file tanpa diunduh. type = document atau jenis lampiran (legality, ia_certificate, ...).
+    // Word / Excel dirender di halaman viewer, PDF / gambar / teks dibuka browser langsung, jenis lain diunduh.
+    public function view($id, $type)
+    {
+        if ($type === 'document') {
+            $client = Client::select('document_name', 'document_mime')->findOrFail($id);
+            abort_if(! $client->document_name, 404);
+            [$name, $mime, $url] = [$client->document_name, $client->document_mime, route('client.document', $id)];
+        } else {
+            $attachment = ClientAttachment::select('file_name', 'file_mime')->where('id_client', $id)->where('type', $type)->firstOrFail();
+            [$name, $mime, $url] = [$attachment->file_name, $attachment->file_mime, route('client.attachment', [$id, $type])];
+        }
+
+        $viewer = ClientAttachment::viewer($name, $mime);
+        if (! in_array($viewer, ['docx', 'sheet'])) {
+            return redirect($viewer === 'inline' ? $url : $url.'?download=1');
+        }
+
+        // Isi dokumen dirender ke halaman ini: script hanya dari tag bernonce, sehingga script atau link javascript:
+        // yang tersisip di dalam file tidak bisa berjalan
+        $nonce = Str::random(32);
+
+        return response()->view('client.viewer', compact('name', 'url', 'viewer', 'nonce'))
+            ->header('Content-Security-Policy', implode('; ', [
+                "default-src 'self'",
+                "script-src 'nonce-$nonce'",
+                "style-src 'self' 'unsafe-inline'",
+                "img-src 'self' data: blob:",
+                "font-src 'self' data: blob:",
+                "connect-src 'self'",
+                "object-src 'none'",
+                "base-uri 'none'",
+                "form-action 'none'",
+                "frame-ancestors 'self'",
+            ]));
+    }
+
     // PDF, gambar & teks dibuka langsung di tab browser (inline); jenis lain, atau dengan ?download=1, diunduh
     private function fileResponse(Request $request, string $content, string $name, string $mime)
     {

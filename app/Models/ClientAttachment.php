@@ -22,8 +22,8 @@ class ClientAttachment extends Model
         'report' => 'Lampiran Report',
     ];
 
-    // Jenis file yang dibuka langsung di browser tanpa diunduh. Jenis lain selalu diunduh: Word/Excel tidak bisa
-    // ditampilkan browser, sedangkan HTML/SVG bisa menjalankan script di dalam aplikasi.
+    // Jenis file yang dikirim inline sehingga dibuka browser langsung. Jenis lain dikirim sebagai unduhan:
+    // HTML/SVG bisa menjalankan script di dalam aplikasi; Word/Excel dibaca lewat halaman viewer (lihat viewer()).
     public const PREVIEWABLE = [
         'application/pdf',
         'image/jpeg',
@@ -53,6 +53,20 @@ class ClientAttachment extends Model
     public static function isPreviewable(?string $mime): bool
     {
         return in_array($mime, self::PREVIEWABLE, true);
+    }
+
+    // Cara membuka file tanpa diunduh: 'docx' / 'sheet' (Word / Excel dirender di halaman viewer),
+    // 'inline' (PDF, gambar, teks dibuka browser langsung), atau null (harus diunduh, mis. .doc lama, .pptx, .zip)
+    public static function viewer(string $name, ?string $mime): ?string
+    {
+        $extension = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+
+        return match (true) {
+            $extension === 'docx' => 'docx',
+            in_array($extension, ['xlsx', 'xlsm', 'xls', 'csv', 'ods']) => 'sheet',
+            self::isPreviewable($mime) => 'inline',
+            default => null,
+        };
     }
 
     // Nama field upload / nilai kolom type: Legalitas + lampiran jadwal audit, mis. ['ia_certificate' => 'IA Lampiran Sertifikat', ...]
