@@ -22,6 +22,17 @@ class ClientAttachment extends Model
         'report' => 'Lampiran Report',
     ];
 
+    // Jenis file yang dibuka langsung di browser tanpa diunduh. Jenis lain selalu diunduh: Word/Excel tidak bisa
+    // ditampilkan browser, sedangkan HTML/SVG bisa menjalankan script di dalam aplikasi.
+    public const PREVIEWABLE = [
+        'application/pdf',
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'text/plain',
+    ];
+
     protected $table = 'client_attachments';
 
     protected $primaryKey = 'id_client_attachment';
@@ -38,6 +49,11 @@ class ClientAttachment extends Model
     protected $hidden = [
         'file'
     ];
+
+    public static function isPreviewable(?string $mime): bool
+    {
+        return in_array($mime, self::PREVIEWABLE, true);
+    }
 
     // Nama field upload / nilai kolom type: Legalitas + lampiran jadwal audit, mis. ['ia_certificate' => 'IA Lampiran Sertifikat', ...]
     public static function types(): array

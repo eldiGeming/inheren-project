@@ -59,7 +59,7 @@ class ClientController extends Controller
 
         // Ambil semua client tanpa kolom BLOB agar list tetap ringan (lampiran juga hanya nama file-nya)
         $allClient = Client::select(array_values(array_diff(Schema::getColumnListing('clients'), ['photo', 'document'])))
-            ->with(['attachments' => fn ($query) => $query->select('id_client_attachment', 'id_client', 'type', 'file_name')])
+            ->with(['attachments' => fn ($query) => $query->select('id_client_attachment', 'id_client', 'type', 'file_name', 'file_mime')])
             ->where('is_deleted', 0)
             ->get();
 
@@ -169,47 +169,40 @@ class ClientController extends Controller
         $client = Client::select('client_name', 'photo', 'photo_mime')->findOrFail($id);
         abort_if(! $client->photo, 404);
 
-        if ($request->boolean('download')) {
-            $extension = MimeTypes::getDefault()->getExtensions($client->photo_mime)[0] ?? 'jpg';
+        $extension = MimeTypes::getDefault()->getExtensions($client->photo_mime)[0] ?? 'jpg';
 
-            return response()->streamDownload(function () use ($client) {
-                echo $client->photo;
-            }, 'foto-'.(Str::slug($client->client_name) ?: $id).'.'.$extension, [
-                'Content-Type' => $client->photo_mime,
-                'X-Content-Type-Options' => 'nosniff',
-            ]);
-        }
-
-        return response($client->photo)
-            ->header('Content-Type', $client->photo_mime)
-            ->header('X-Content-Type-Options', 'nosniff');
+        return $this->fileResponse($request, $client->photo, 'foto-'.(Str::slug($client->client_name) ?: $id).'.'.$extension, $client->photo_mime);
     }
 
-    // Download dokumen (BLOB) client
-    public function document($id)
+    // Buka dokumen (BLOB) client di browser, atau unduh dengan ?download=1
+    public function document(Request $request, $id)
     {
         $client = Client::select('document', 'document_name', 'document_mime')->findOrFail($id);
         abort_if(! $client->document, 404);
 
-        return response()->streamDownload(function () use ($client) {
-            echo $client->document;
-        }, $client->document_name, [
-            'Content-Type' => $client->document_mime,
-            'X-Content-Type-Options' => 'nosniff',
-        ]);
+        return $this->fileResponse($request, $client->document, $client->document_name, $client->document_mime);
     }
 
-    // Download file Legalitas / lampiran jadwal audit (BLOB), mis. type = legality, ia_certificate
-    public function attachment($id, $type)
+    // Buka file Legalitas / lampiran jadwal audit (BLOB) di browser, atau unduh dengan ?download=1.
+    // type mis. legality, ia_certificate
+    public function attachment(Request $request, $id, $type)
     {
         $attachment = ClientAttachment::where('id_client', $id)->where('type', $type)->firstOrFail();
 
-        return response()->streamDownload(function () use ($attachment) {
-            echo $attachment->file;
-        }, $attachment->file_name, [
-            'Content-Type' => $attachment->file_mime,
+        return $this->fileResponse($request, $attachment->file, $attachment->file_name, $attachment->file_mime);
+    }
+
+    // PDF, gambar & teks dibuka langsung di tab browser (inline); jenis lain, atau dengan ?download=1, diunduh
+    private function fileResponse(Request $request, string $content, string $name, string $mime)
+    {
+        $inline = ! $request->boolean('download') && ClientAttachment::isPreviewable($mime);
+
+        return response()->streamDownload(function () use ($content) {
+            echo $content;
+        }, $name, [
+            'Content-Type' => $mime === 'text/plain' ? 'text/plain; charset=UTF-8' : $mime,
             'X-Content-Type-Options' => 'nosniff',
-        ]);
+        ], $inline ? 'inline' : 'attachment');
     }
 
     // Pilihan dropdown Sales / PIC dari data client yang sudah ada, sehingga entri baru otomatis tersedia

@@ -112,10 +112,10 @@
                 <div>
                     <div class="client-file">
                         @if($legality)
-                            <a href="{{ route('client.attachment', [$row->id_client, \App\Models\ClientAttachment::LEGALITY]) }}" class="file-current btn btn-light border flex-shrink-0 p-0"
-                                title="Unduh legalitas saat ini: {{ $legality->file_name }}" aria-label="Unduh legalitas saat ini: {{ $legality->file_name }}">
-                                <i class="bi bi-download"></i>
-                            </a>
+                            @include('client.current-file', [
+                                'url' => route('client.attachment', [$row->id_client, \App\Models\ClientAttachment::LEGALITY]),
+                                'name' => $legality->file_name, 'mime' => $legality->file_mime, 'label' => 'legalitas',
+                            ])
                         @endif
                         <div class="client-file-input">
                             <input type="file" id="{{ $uid }}_legality" name="legality" class="form-control">
@@ -151,10 +151,10 @@
                 <div>
                     <div class="client-file">
                         @if($row?->document_name)
-                            <a href="{{ route('client.document', $row->id_client) }}" class="file-current btn btn-light border flex-shrink-0 p-0"
-                                title="Unduh dokumen saat ini: {{ $row->document_name }}" aria-label="Unduh dokumen saat ini: {{ $row->document_name }}">
-                                <i class="bi bi-download"></i>
-                            </a>
+                            @include('client.current-file', [
+                                'url' => route('client.document', $row->id_client),
+                                'name' => $row->document_name, 'mime' => $row->document_mime, 'label' => 'dokumen',
+                            ])
                         @endif
                         <div class="client-file-input">
                             <input type="file" id="{{ $uid }}_document" name="document" class="form-control">
@@ -222,10 +222,10 @@
                         <div>
                             <div class="client-file">
                                 @if($file)
-                                    <a href="{{ route('client.attachment', [$row->id_client, $type]) }}" class="file-current btn btn-light border flex-shrink-0 p-0"
-                                        title="Unduh {{ $stageLabel }} {{ $kindLabel }} saat ini: {{ $file->file_name }}" aria-label="Unduh {{ $stageLabel }} {{ $kindLabel }} saat ini: {{ $file->file_name }}">
-                                        <i class="bi bi-download"></i>
-                                    </a>
+                                    @include('client.current-file', [
+                                        'url' => route('client.attachment', [$row->id_client, $type]),
+                                        'name' => $file->file_name, 'mime' => $file->file_mime, 'label' => $stageLabel.' '.$kindLabel,
+                                    ])
                                 @endif
                                 <div class="client-file-input">
                                     <input type="file" id="{{ $uid }}_{{ $type }}" name="{{ $type }}" class="form-control" aria-label="{{ $stageLabel }} {{ $kindLabel }}">

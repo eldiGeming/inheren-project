@@ -416,9 +416,10 @@ html.app-skin-dark .client-form .btn-client:active{
                     <div class="col-md-4 fw-bold">Legalitas</div>
                     <div class="col-md-8">
                         @if($legality)
-                            <a href="{{ route('client.attachment', [$row->id_client, \App\Models\ClientAttachment::LEGALITY]) }}">
-                                <i class="bi bi-download me-1"></i>{{ $legality->file_name }}
-                            </a>
+                            @include('client.file-link', [
+                                'url' => route('client.attachment', [$row->id_client, \App\Models\ClientAttachment::LEGALITY]),
+                                'name' => $legality->file_name, 'mime' => $legality->file_mime,
+                            ])
                         @else
                             <span class="text-muted">-</span>
                         @endif
@@ -429,7 +430,7 @@ html.app-skin-dark .client-form .btn-client:active{
                     <div class="col-md-8" style="white-space: pre-line;">{{ $row->note ?: '-' }}</div>
                 </div>
 
-                {{-- Jadwal audit beserta Lampiran Sertifikat & Report yang bisa diunduh --}}
+                {{-- Jadwal audit beserta Lampiran Sertifikat & Report yang bisa dibuka / diunduh --}}
                 @foreach(\App\Models\ClientAttachment::STAGES as $stage => $stageLabel)
                 <div class="row mb-3 py-2 border-bottom detail-row">
                     <div class="col-md-4 fw-bold">{{ $stageLabel }}</div>
@@ -440,9 +441,10 @@ html.app-skin-dark .client-form .btn-client:active{
                             <div class="small mt-1">
                                 <span class="text-muted">{{ $kindLabel }}:</span>
                                 @if($file)
-                                    <a href="{{ route('client.attachment', [$row->id_client, $stage.'_'.$kind]) }}">
-                                        <i class="bi bi-download me-1"></i>{{ $file->file_name }}
-                                    </a>
+                                    @include('client.file-link', [
+                                        'url' => route('client.attachment', [$row->id_client, $stage.'_'.$kind]),
+                                        'name' => $file->file_name, 'mime' => $file->file_mime,
+                                    ])
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif
@@ -473,9 +475,10 @@ html.app-skin-dark .client-form .btn-client:active{
                     <div class="col-md-4 fw-bold">Dokumen</div>
                     <div class="col-md-8">
                         @if($row->document_name)
-                            <a href="{{ route('client.document', $row->id_client) }}">
-                                <i class="bi bi-download me-1"></i>{{ $row->document_name }}
-                            </a>
+                            @include('client.file-link', [
+                                'url' => route('client.document', $row->id_client),
+                                'name' => $row->document_name, 'mime' => $row->document_mime,
+                            ])
                         @else
                             <span class="text-muted">No Dokumen</span>
                         @endif
