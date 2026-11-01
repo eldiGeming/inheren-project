@@ -194,8 +194,11 @@ class ClientController extends Controller
 
     // Buka file tanpa diunduh. type = document atau jenis lampiran (legality, ia_certificate, ...).
     // Word / Excel dirender di halaman viewer, PDF / gambar / teks dibuka browser langsung, jenis lain diunduh.
-    public function view($id, $type)
+    // ?embed=1: tampil di panel preview modal detail (tanpa bar judul, halaman Word mengikuti lebar panel)
+    public function view(Request $request, $id, $type)
     {
+        $embed = $request->boolean('embed');
+
         if ($type === 'document') {
             $client = Client::select('document_name', 'document_mime')->findOrFail($id);
             abort_if(! $client->document_name, 404);
@@ -214,7 +217,7 @@ class ClientController extends Controller
         // yang tersisip di dalam file tidak bisa berjalan
         $nonce = Str::random(32);
 
-        return response()->view('client.viewer', compact('name', 'url', 'viewer', 'nonce'))
+        return response()->view('client.viewer', compact('name', 'url', 'viewer', 'nonce', 'embed'))
             ->header('Content-Security-Policy', implode('; ', [
                 "default-src 'self'",
                 "script-src 'nonce-$nonce'",

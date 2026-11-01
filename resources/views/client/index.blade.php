@@ -15,6 +15,237 @@ html.app-skin-dark .detail-row:hover{
     background: #1b2436;
 }
 
+/* ===== Modal detail: file dengan ikon mata (radio) & panel preview di kanan ===== */
+.detail-file{
+    display: grid;
+    gap: 4px;
+    margin-top: 10px;
+}
+.detail-file-label{
+    font-size: 12px;
+    color: #667085;
+}
+.file-item{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    font-size: 13px;
+}
+.file-item-open{
+    display: flex;
+    align-items: center;
+    gap: 12px; /* jarak ikon mata ke nama file */
+    min-width: 0;
+    margin: 0;
+    cursor: pointer;
+}
+.file-item-eye,
+.file-item-download{
+    flex-shrink: 0;
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+.file-item-eye{
+    border: 1px solid #d0d5dd;
+    background: #fff;
+    color: #475467;
+}
+.file-item-name{
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.file-item-open:hover .file-item-eye{
+    border-color: #3454d1;
+    color: #3454d1;
+}
+.file-item-open:has(.file-preview-radio:checked) .file-item-eye{
+    border-color: #3454d1;
+    background: #3454d1;
+    color: #fff;
+}
+.file-item-open:has(.file-preview-radio:checked) .file-item-name{
+    color: #3454d1;
+    font-weight: 600;
+}
+.file-item-open:has(.file-preview-radio:focus-visible) .file-item-eye{
+    outline: 2px solid #3454d1;
+    outline-offset: 2px;
+}
+.file-item-open.is-disabled{
+    cursor: default;
+}
+.file-item-open.is-disabled .file-item-eye{
+    border-style: dashed;
+    background: transparent;
+    color: #98a2b3;
+}
+.file-item-download{
+    color: #475467;
+}
+.file-item-download:hover,
+.file-item-download:focus-visible{
+    background: #eef1fb;
+    color: #3454d1;
+}
+html.app-skin-dark .detail-file-label{
+    color: #98a2b3;
+}
+html.app-skin-dark .file-item-eye{
+    border-color: #2a3650;
+    background: #131c2e;
+    color: #cbd5e1;
+}
+html.app-skin-dark .file-item-open:hover .file-item-eye{
+    border-color: #6f8cf2;
+    color: #a9bbff;
+}
+html.app-skin-dark .file-item-open:has(.file-preview-radio:checked) .file-item-eye{
+    border-color: #3454d1;
+    background: #3454d1;
+    color: #fff;
+}
+html.app-skin-dark .file-item-open:has(.file-preview-radio:checked) .file-item-name{
+    color: #a9bbff;
+}
+html.app-skin-dark .file-item-open.is-disabled .file-item-eye{
+    background: transparent;
+    color: #667085;
+}
+html.app-skin-dark .file-item-download:hover,
+html.app-skin-dark .file-item-download:focus-visible{
+    background: #1b2436;
+}
+
+/* Modal melebar ke kanan saat ada file yang dipreview; info & preview punya scroll sendiri */
+.client-detail-dialog{
+    transition: max-width 0.3s ease;
+}
+.client-preview{
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: #f2f4f7;
+}
+@media (min-width: 992px){
+    .client-detail-dialog.is-previewing{
+        max-width: min(1440px, calc(100vw - 3rem));
+    }
+    .client-detail-dialog.is-previewing .client-detail-layout{
+        display: grid;
+        grid-template-columns: minmax(380px, 5fr) 7fr;
+        height: min(78vh, 880px);
+    }
+    .client-detail-dialog.is-previewing .client-detail-info{
+        overflow-y: auto;
+    }
+    .client-detail-dialog.is-previewing .client-preview{
+        border-left: 1px solid #e4e7ec;
+    }
+}
+@media (max-width: 991.98px){
+    .client-preview{
+        height: 70vh;
+        border-top: 1px solid #e4e7ec;
+    }
+}
+.client-preview-head{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px 10px 16px;
+    border-bottom: 1px solid #e4e7ec;
+    background: #fff;
+}
+.client-preview-icon{
+    color: #3454d1;
+}
+.client-preview-name{
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    font-weight: 600;
+    color: #101828;
+}
+.client-preview-action{
+    display: inline-grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    background: #fff;
+    color: #344054;
+}
+.client-preview-action:hover,
+.client-preview-action:focus-visible{
+    border-color: #3454d1;
+    color: #3454d1;
+}
+.client-preview-stage{
+    position: relative;
+    flex: 1;
+    min-height: 0;
+}
+.client-preview-stage iframe{
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
+}
+.client-preview-stage img{
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+    object-fit: contain;
+}
+.client-preview-loading{
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    text-align: center;
+    font-size: 14px;
+    color: #667085;
+    background: inherit;
+}
+html.app-skin-dark .client-preview{
+    background: #0b1220;
+}
+html.app-skin-dark .client-detail-dialog.is-previewing .client-preview,
+html.app-skin-dark .client-preview,
+html.app-skin-dark .client-preview-head{
+    border-color: #1b2436;
+}
+html.app-skin-dark .client-preview-head{
+    background: #0f172a;
+}
+html.app-skin-dark .client-preview-name{
+    color: #e5e7eb;
+}
+html.app-skin-dark .client-preview-action{
+    border-color: #2a3650;
+    background: #131c2e;
+    color: #e5e7eb;
+}
+html.app-skin-dark .client-preview-loading{
+    color: #98a2b3;
+}
+
 /* Thumbnail foto & tombol unduh file lama di modal edit, setinggi input file */
 .file-current{
     width: 40px;
@@ -38,9 +269,17 @@ select + .select2-container--bootstrap-5.select2-container--open{
 
 /* ===== Form Data Client mengikuti mockup klien: label di kiri, field berbentuk pill bergaris ungu ===== */
 .client-form{
-    --client-line: #8a4fd0;
+    --client-line: #b9a3e0;        /* garis field saat diam */
+    --client-line-strong: #8a4fd0; /* garis field saat hover & fokus */
     --client-accent: #6a2bb5;
-    --client-ring: rgba(138, 79, 208, 0.22);
+    --client-ring: rgba(138, 79, 208, 0.18);
+    --client-field: #ffffff;
+    --client-surface: #f6f4fb;     /* latar body modal */
+    --client-panel: #ffffff;
+    --client-panel-line: #e9e3f5;
+    --client-stage: #faf8fe;
+    --client-text: #1d2433;
+    --client-muted: #667085;
     --client-label: 8.25rem; /* muat "Lampiran Sertifikat" */
 }
 /* Layar lebar (3 kolom): kolom kiri & tengah cukup label pendek agar input lebih lebar */
@@ -50,9 +289,17 @@ select + .select2-container--bootstrap-5.select2-container--open{
     }
 }
 html.app-skin-dark .client-form{
-    --client-line: #a77de0;
+    --client-line: #5a4d8a;
+    --client-line-strong: #a77de0;
     --client-accent: #c4a3ef;
-    --client-ring: rgba(167, 125, 224, 0.3);
+    --client-ring: rgba(167, 125, 224, 0.28);
+    --client-field: #0d1424;
+    --client-surface: #0b1120;
+    --client-panel: #111a2e;
+    --client-panel-line: #222b45;
+    --client-stage: #0e1628;
+    --client-text: #e5e7eb;
+    --client-muted: #98a2b3;
 }
 
 /* Satu baris field: label di kiri, input (+ pesan error) di kanan */
@@ -86,11 +333,28 @@ html.app-skin-dark .client-form .form-control,
 .client-form .select2-container--bootstrap-5 .select2-selection{
     border-color: var(--client-line) !important;
     border-radius: 50rem;
+    background-color: var(--client-field) !important;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.client-form .form-control:hover,
+html.app-skin-dark .client-form .form-control:hover,
+.client-form .form-control:focus,
+html.app-skin-dark .client-form .form-control:focus,
+.client-form .select2-container--bootstrap-5 .select2-selection:hover,
+.client-form .select2-container--focus .select2-selection,
+.client-form .select2-container--open .select2-selection{
+    border-color: var(--client-line-strong) !important;
 }
 .client-form .form-control{
     height: 40px;
     padding: 0 16px;
     font-size: 13px;
+    color: var(--client-text);
+}
+.client-form .client-field > .form-label{
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--client-text);
 }
 /* Note: kotak teks beberapa baris, sudut membulat mengikuti gaya pill */
 .client-form textarea.form-control{
@@ -98,7 +362,7 @@ html.app-skin-dark .client-form .form-control,
     min-height: 96px;
     padding: 10px 16px;
     line-height: 1.5;
-    border-radius: 18px;
+    border-radius: 14px;
     resize: vertical;
 }
 .client-form .form-control:focus,
@@ -185,11 +449,11 @@ html.app-skin-dark .client-form input[type="date"]::-webkit-calendar-picker-indi
     align-items: center;
     gap: 6px;
     margin-top: 4px;
-    padding-left: 16px;
+    padding-left: 8px;
     font-size: 12px;
     line-height: 1.5;
 }
-.client-current-label{
+.client-current-icon{
     flex-shrink: 0;
     color: #6b7280;
 }
@@ -212,7 +476,7 @@ html.app-skin-dark .client-form input[type="date"]::-webkit-calendar-picker-indi
 .client-current-file > .text-muted{
     display: none;
 }
-html.app-skin-dark .client-current-label{
+html.app-skin-dark .client-current-icon{
     color: #9ca3af;
 }
 .client-note{
@@ -233,41 +497,255 @@ html.app-skin-dark .client-note{
     background-color: rgba(167, 125, 224, 0.08);
 }
 
-/* Tombol CLEAR (merah muda) & SAVE (hijau muda) seperti mockup */
-.client-form .btn-client{
-    min-width: 116px;
-    padding: 10px 28px;
+/* ===== Tampilan modern modal Create/Edit (posisi field tetap seperti mockup) ===== */
+.client-form .modal-body{
+    padding: 20px;
+    background: var(--client-surface);
+}
+/* Tiap kolom menjadi panel berjudul, tinggi panel dalam satu baris disamakan */
+.client-form .modal-body > .row{
+    row-gap: 16px;
+}
+.client-panel{
+    padding: 16px 16px 8px;
+    border: 1px solid var(--client-panel-line);
+    border-radius: 16px;
+    background: var(--client-panel);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+.client-panel-title{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--client-panel-line);
     font-size: 13px;
-    color: #1f2937;
-    border: 1px solid var(--client-line);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: var(--client-text);
+}
+.client-panel-title .bi{
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(138, 79, 208, 0.12);
+    color: var(--client-accent);
+    font-size: 14px;
+}
+
+/* Tahap audit (IA/SA1/SA2/RC) dalam blok sendiri; label tahap berwarna, lampiran bergaris penghubung */
+.client-stage-box{
+    --client-label: 6.5rem;
+    padding: 10px 12px 2px;
+    border: 1px solid var(--client-panel-line);
+    border-radius: 14px;
+    background: var(--client-stage);
+}
+.client-stage-box > .client-field:first-child > .form-label{
+    color: var(--client-accent) !important;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+.client-field-sub > .form-label::before{
+    content: "";
+    flex-shrink: 0;
+    width: 8px;
+    height: 1px;
+    margin-right: 6px;
+    background: var(--client-line);
+}
+
+/* Input file bergaris putus-putus agar beda dari isian teks */
+.client-file-input .form-control,
+html.app-skin-dark .client-file-input .form-control{
+    border-style: dashed !important;
+}
+.client-file-input .form-control:hover{
+    background-color: rgba(138, 79, 208, 0.04) !important;
+}
+
+/* File yang tersimpan tampil sebagai chip */
+.client-current-file{
+    padding: 2px 10px;
     border-radius: 50rem;
+    background: rgba(138, 79, 208, 0.08);
+}
+html.app-skin-dark .client-current-file{
+    background: rgba(167, 125, 224, 0.14);
+}
+
+/* Catatan info dengan ikon */
+.client-note{
+    display: flex;
+    gap: 8px;
+    border-left: 0;
+    border-radius: 12px;
+}
+.client-note > .bi{
+    flex-shrink: 0;
+    color: var(--client-accent);
+    font-size: 15px;
+    line-height: 1.3;
+}
+
+@media (min-width: 1200px){
+    .client-form-dialog{
+        max-width: min(1320px, calc(100vw - 2rem));
+    }
+}
+
+/* Header: bersih dengan ikon & garis aksen (biru = tambah, kuning = edit) */
+.client-form-header{
+    position: relative;
+    overflow: hidden; /* garis aksen ikut sudut membulat modal (rounded-4) */
+    border-radius: 1rem 1rem 0 0;
+    padding: 18px 20px 16px;
+    border-bottom: 1px solid var(--client-panel-line);
+    background: var(--client-panel);
+}
+.client-form-header::before{
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    border-radius: inherit;
+}
+.client-form-header.is-create::before{
+    background: #3454d1;
+}
+.client-form-header.is-edit::before{
+    background: #f59e0b;
+}
+.client-form-heading{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+.client-form-badge{
+    flex-shrink: 0;
+    display: inline-grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 18px;
+}
+.is-create .client-form-badge{
+    background: rgba(52, 84, 209, 0.12);
+    color: #3454d1;
+}
+.is-edit .client-form-badge{
+    background: rgba(245, 158, 11, 0.16);
+    color: #b45309;
+}
+.client-form-header .modal-title{
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--client-text);
+}
+.client-form-subtitle{
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 12.5px;
+    color: var(--client-muted);
+}
+html.app-skin-dark .is-create .client-form-badge{
+    background: rgba(99, 130, 245, 0.18);
+    color: #a9bbff;
+}
+html.app-skin-dark .is-edit .client-form-badge{
+    background: rgba(245, 158, 11, 0.16);
+    color: #fbbf24;
+}
+html.app-skin-dark .client-form-header .btn-close{
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Footer menempel di bawah layar selama form di-scroll */
+.client-form .modal-footer{
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--client-panel-line);
+    background: var(--client-panel);
+    box-shadow: 0 -6px 16px rgba(16, 24, 40, 0.06);
+}
+
+/* Tombol CLEAR (merah muda) & SAVE (hijau) seperti mockup, versi lebih tegas dengan ikon */
+.client-form .btn-client{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 128px;
+    min-height: 44px;
+    padding: 0 24px;
+    border: 1px solid transparent;
+    border-radius: 50rem;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: background-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.client-form .btn-client .bi{
+    font-size: 15px;
+}
+.client-form .btn-client:active{
+    transform: translateY(1px);
 }
 .client-form .btn-client-clear{
-    background-color: #ffd9dc;
+    border-color: #fecdd3;
+    background-color: #fff1f2;
 }
 .client-form .btn-client-clear:hover,
 .client-form .btn-client-clear:focus-visible{
-    background-color: #ffc2c8;
-    color: #1f2937;
+    background-color: #ffe4e6;
 }
 .client-form .btn-client-save{
-    background-color: #e3f9c8;
+    background-color: #16a34a;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
 }
 .client-form .btn-client-save:hover,
 .client-form .btn-client-save:focus-visible{
-    background-color: #cff3a4;
-    color: #1f2937;
+    background-color: #15803d;
 }
-/* Tema memaksa teks tombol putih (saat fokus/klik, dan selalu di dark mode); latar tombol pastel, jadi teks tetap gelap */
-.client-form .btn-client,
-.client-form .btn-client:hover,
-.client-form .btn-client:focus,
-.client-form .btn-client:active,
-html.app-skin-dark .client-form .btn-client,
-html.app-skin-dark .client-form .btn-client:hover,
-html.app-skin-dark .client-form .btn-client:focus,
-html.app-skin-dark .client-form .btn-client:active{
-    color: #1f2937 !important;
+html.app-skin-dark .client-form .btn-client-clear{
+    border-color: rgba(244, 63, 94, 0.35);
+    background-color: rgba(244, 63, 94, 0.12);
+}
+html.app-skin-dark .client-form .btn-client-clear:hover,
+html.app-skin-dark .client-form .btn-client-clear:focus-visible{
+    background-color: rgba(244, 63, 94, 0.2);
+}
+/* Tema memaksa warna teks tombol (putih saat fokus/klik & di dark mode); tetapkan warna sesuai latar tombol */
+.client-form .btn-client-clear,
+.client-form .btn-client-clear:hover,
+.client-form .btn-client-clear:focus,
+.client-form .btn-client-clear:active{
+    color: #be123c !important;
+}
+html.app-skin-dark .client-form .btn-client-clear,
+html.app-skin-dark .client-form .btn-client-clear:hover,
+html.app-skin-dark .client-form .btn-client-clear:focus,
+html.app-skin-dark .client-form .btn-client-clear:active{
+    color: #fda4af !important;
+}
+.client-form .btn-client-save,
+.client-form .btn-client-save:hover,
+.client-form .btn-client-save:focus,
+.client-form .btn-client-save:active,
+html.app-skin-dark .client-form .btn-client-save,
+html.app-skin-dark .client-form .btn-client-save:hover,
+html.app-skin-dark .client-form .btn-client-save:focus,
+html.app-skin-dark .client-form .btn-client-save:active{
+    color: #fff !important;
 }
 </style>
 
@@ -384,13 +862,19 @@ html.app-skin-dark .client-form .btn-client:active{
 
 {{-- ================= MODAL CREATE ================= --}}
 <div class="modal fade" id="createClientModal" tabindex="-1">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-dialog modal-xl modal-dialog-centered client-form-dialog">
         <div class="modal-content rounded-4">
             <form id="createClientForm" class="client-form" action="{{ route('client.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">Data Client</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header client-form-header is-create">
+                    <div class="client-form-heading">
+                        <span class="client-form-badge" aria-hidden="true"><i class="bi bi-person-plus"></i></span>
+                        <div>
+                            <h5 class="modal-title">Data Client</h5>
+                            <div class="client-form-subtitle">Tambah client baru</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
                 @include('client.form', ['row' => null])
             </form>
@@ -401,15 +885,21 @@ html.app-skin-dark .client-form .btn-client:active{
 {{-- ================= MODAL UPDATE ================= --}}
 @foreach($allClient as $row)
 <div class="modal fade" id="updateClientModal{{ $row->id_client }}" tabindex="-1">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-dialog modal-xl modal-dialog-centered client-form-dialog">
         <div class="modal-content rounded-4">
             <form class="updateClientForm client-form" data-id="{{ $row->id_client }}" action="{{ route('client.update', $row->id_client) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PATCH')
 
-                <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title">Edit Data Client</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header client-form-header is-edit">
+                    <div class="client-form-heading">
+                        <span class="client-form-badge" aria-hidden="true"><i class="bi bi-pencil-square"></i></span>
+                        <div>
+                            <h5 class="modal-title">Edit Data Client</h5>
+                            <div class="client-form-subtitle">{{ $row->client_name }}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
                 @include('client.form', ['row' => $row])
             </form>
@@ -420,8 +910,8 @@ html.app-skin-dark .client-form .btn-client:active{
 
 {{-- ================= MODAL DETAIL ================= --}}
 @foreach($allClient as $row)
-<div class="modal fade" id="clientModal{{ $row->id_client }}" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+<div class="modal fade client-detail-modal" id="clientModal{{ $row->id_client }}" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered client-detail-dialog">
         <div class="modal-content rounded-4 shadow-sm">
             <!-- Header -->
             <div class="modal-header bg-info text-white">
@@ -429,8 +919,10 @@ html.app-skin-dark .client-form .btn-client:active{
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
-            <!-- Body -->
-            <div class="modal-body">
+            {{-- Body: info client di kiri; panel preview file muncul di kanan saat ikon mata dipilih --}}
+            @php($group = 'preview'.$row->id_client)
+            <div class="client-detail-layout">
+            <div class="modal-body client-detail-info">
                 @foreach([
                     'Client Name' => $row->client_name,
                     'Scope' => $row->scope,
@@ -453,7 +945,7 @@ html.app-skin-dark .client-form .btn-client:active{
                     <div class="col-md-4 fw-bold">Legalitas</div>
                     <div class="col-md-8">
                         @if($legality)
-                            @include('client.file-link', [
+                            @include('client.file-preview', [
                                 'url' => route('client.attachment', [$row->id_client, \App\Models\ClientAttachment::LEGALITY]),
                                 'view' => route('client.view', [$row->id_client, \App\Models\ClientAttachment::LEGALITY]),
                                 'name' => $legality->file_name, 'mime' => $legality->file_mime,
@@ -476,10 +968,10 @@ html.app-skin-dark .client-form .btn-client:active{
                         {{ $dateText($row->{$stage.'_date'}) ?: '-' }}
                         @foreach(\App\Models\ClientAttachment::KINDS as $kind => $kindLabel)
                             @php($file = $files->get($stage.'_'.$kind))
-                            <div class="small mt-1">
-                                <span class="text-muted">{{ $kindLabel }}:</span>
+                            <div class="detail-file">
+                                <span class="detail-file-label">{{ $kindLabel }}</span>
                                 @if($file)
-                                    @include('client.file-link', [
+                                    @include('client.file-preview', [
                                         'url' => route('client.attachment', [$row->id_client, $stage.'_'.$kind]),
                                         'view' => route('client.view', [$row->id_client, $stage.'_'.$kind]),
                                         'name' => $file->file_name, 'mime' => $file->file_mime,
@@ -497,14 +989,11 @@ html.app-skin-dark .client-form .btn-client:active{
                     <div class="col-md-4 fw-bold">Foto</div>
                     <div class="col-md-8">
                         @if($row->photo_mime)
-                            <a href="{{ route('client.photo', $row->id_client) }}" target="_blank">
-                                <img src="{{ route('client.photo', $row->id_client) }}" width="150" class="img-thumbnail" loading="lazy" alt="Foto">
-                            </a>
-                            <div class="small mt-1">
-                                <a href="{{ route('client.photo', ['id' => $row->id_client, 'download' => 1]) }}">
-                                    <i class="bi bi-download me-1"></i>Download foto
-                                </a>
-                            </div>
+                            <img src="{{ route('client.photo', $row->id_client) }}" width="150" class="img-thumbnail d-block mb-2" loading="lazy" alt="Foto {{ $row->client_name }}">
+                            @include('client.file-preview', [
+                                'url' => route('client.photo', $row->id_client), 'view' => null,
+                                'name' => 'Foto '.$row->client_name, 'mime' => $row->photo_mime,
+                            ])
                         @else
                             <span class="text-muted">No Foto</span>
                         @endif
@@ -514,7 +1003,7 @@ html.app-skin-dark .client-form .btn-client:active{
                     <div class="col-md-4 fw-bold">Dokumen</div>
                     <div class="col-md-8">
                         @if($row->document_name)
-                            @include('client.file-link', [
+                            @include('client.file-preview', [
                                 'url' => route('client.document', $row->id_client),
                                 'view' => route('client.view', [$row->id_client, 'document']),
                                 'name' => $row->document_name, 'mime' => $row->document_mime,
@@ -524,6 +1013,22 @@ html.app-skin-dark .client-form .btn-client:active{
                         @endif
                     </div>
                 </div>
+            </div>
+
+            {{-- Panel preview: diisi JS dari ikon mata yang dipilih --}}
+            <aside class="client-preview" aria-label="Preview file" hidden>
+                <div class="client-preview-head">
+                    <i class="bi bi-eye client-preview-icon" aria-hidden="true"></i>
+                    <span class="client-preview-name"></span>
+                    <a href="#" class="client-preview-action client-preview-download" title="Unduh file ini" aria-label="Unduh file ini">
+                        <i class="bi bi-download"></i>
+                    </a>
+                    <button type="button" class="client-preview-action client-preview-close" title="Tutup preview" aria-label="Tutup preview">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="client-preview-stage"></div>
+            </aside>
             </div>
 
             <!-- Footer -->
@@ -682,6 +1187,47 @@ $(document).ready(function() {
         if (owner && !name.val()) {
             setTagValue(name, owner);
         }
+    });
+
+    // ================= PREVIEW FILE DI MODAL DETAIL =================
+    // Ikon mata bersifat radio: file yang dipilih tampil di panel kanan dan modal melebar, tanpa membuka tab baru
+    function closePreview(modal){
+        modal.find('.file-preview-radio').prop('checked', false);
+        modal.find('.client-preview-stage').empty();
+        modal.find('.client-preview').prop('hidden', true);
+        modal.find('.client-detail-dialog').removeClass('is-previewing');
+    }
+
+    $(document).on('change', '.file-preview-radio', function(){
+        let modal = $(this).closest('.modal');
+        let panel = modal.find('.client-preview');
+        let file = this.dataset;
+        let loading = $('<div class="client-preview-loading" role="status">').text('Memuat preview...');
+        let media = file.kind === 'image'
+            ? $('<img>').attr('alt', 'Preview ' + file.name)
+            : $('<iframe>').attr('title', 'Preview ' + file.name);
+
+        media.on('load', function(){
+            loading.remove();
+        }).on('error', function(){
+            loading.text('Preview gagal dimuat. Gunakan tombol unduh di atas.');
+        });
+
+        panel.find('.client-preview-name').text(file.name).attr('title', file.name);
+        panel.find('.client-preview-download').attr('href', file.download);
+        panel.find('.client-preview-stage').empty().append(media, loading);
+        media.attr('src', file.src);
+        panel.prop('hidden', false);
+        modal.find('.client-detail-dialog').addClass('is-previewing');
+    });
+
+    $(document).on('click', '.client-preview-close', function(){
+        closePreview($(this).closest('.modal'));
+    });
+
+    // Modal ditutup: preview & pilihan ikon mata direset
+    $('.client-detail-modal').on('hidden.bs.modal', function(){
+        closePreview($(this));
     });
 
     // Tombol Clear: hapus pesan error dan sinkronkan tampilan Select2 setelah form di-reset

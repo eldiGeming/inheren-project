@@ -132,10 +132,20 @@
             white-space: nowrap;
             vertical-align: top;
         }
+
+        /* Di dalam panel preview modal: tanpa bar judul, jarak lebih rapat */
+        body.is-embed .viewer-body {
+            padding: 12px;
+        }
+
+        body.is-embed .viewer-body .docx-wrapper > section.docx {
+            margin-bottom: 12px;
+        }
     </style>
 </head>
-<body>
+<body class="{{ $embed ? 'is-embed' : '' }}">
 
+@unless($embed)
 <header class="viewer-bar">
     <div class="viewer-name" title="{{ $name }}">{{ $name }}</div>
     <a class="viewer-download" href="{{ $url }}?download=1">
@@ -143,6 +153,7 @@
         Unduh
     </a>
 </header>
+@endunless
 
 <main class="viewer-body" id="viewer" data-src="{{ $url }}?download=1" data-kind="{{ $viewer }}">
     <div class="viewer-status" id="viewerStatus" role="status">Memuat dokumen...</div>
@@ -211,6 +222,16 @@
                 renderHeaders: true,
                 renderFooters: true,
             });
+
+            // Halaman Word (lebar kertas tetap) diperkecil bila tidak muat, mis. di panel preview modal
+            const wrapper = page.querySelector('.docx-wrapper');
+            const fit = function () {
+                wrapper.style.zoom = '';
+                const available = main.clientWidth - 24;
+                wrapper.style.zoom = wrapper.scrollWidth > available ? available / wrapper.scrollWidth : '';
+            };
+            fit();
+            window.addEventListener('resize', fit);
         } else {
             renderWorkbook(XLSX.read(data, { type: 'array', cellDates: true }));
         }
